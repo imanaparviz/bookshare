@@ -1,0 +1,152 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ $book->title }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+            <!-- Success Message -->
+            @if (session('success'))
+                <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <!-- Book Cover -->
+                        <div class="md:col-span-1">
+                            @if($book->image_path)
+                                <img src="{{ asset('storage/' . $book->image_path) }}" 
+                                     alt="Cover von {{ $book->title }}" 
+                                     class="w-full max-w-sm mx-auto rounded-lg shadow-lg">
+                            @else
+                                <div class="w-full max-w-sm mx-auto h-96 bg-gray-200 dark:bg-gray-600 rounded-lg shadow-lg flex items-center justify-center">
+                                    <span class="text-gray-500 dark:text-gray-400 text-lg">Kein Cover verfügbar</span>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Book Details -->
+                        <div class="md:col-span-2">
+                            <div class="space-y-6">
+                                <!-- Title and Author -->
+                                <div>
+                                    <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                                        {{ $book->title }}
+                                    </h1>
+                                    <p class="text-xl text-gray-600 dark:text-gray-400">
+                                        von {{ $book->author }}
+                                    </p>
+                                </div>
+
+                                <!-- Status and Condition -->
+                                <div class="flex space-x-4">
+                                    <span class="inline-block px-3 py-1 text-sm font-semibold rounded-full
+                                        @if($book->status === 'verfügbar') bg-green-100 text-green-800
+                                        @elseif($book->status === 'ausgeliehen') bg-red-100 text-red-800
+                                        @else bg-yellow-100 text-yellow-800 @endif">
+                                        {{ ucfirst($book->status) }}
+                                    </span>
+                                    <span class="inline-block px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        Zustand: {{ ucfirst($book->condition) }}
+                                    </span>
+                                </div>
+
+                                <!-- Book Information -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                    @if($book->isbn)
+                                        <div>
+                                            <span class="font-semibold text-gray-700 dark:text-gray-300">ISBN:</span>
+                                            <span class="text-gray-600 dark:text-gray-400">{{ $book->isbn }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if($book->genre)
+                                        <div>
+                                            <span class="font-semibold text-gray-700 dark:text-gray-300">Genre:</span>
+                                            <span class="text-gray-600 dark:text-gray-400">{{ $book->genre }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if($book->publication_year)
+                                        <div>
+                                            <span class="font-semibold text-gray-700 dark:text-gray-300">Erscheinungsjahr:</span>
+                                            <span class="text-gray-600 dark:text-gray-400">{{ $book->publication_year }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if($book->language)
+                                        <div>
+                                            <span class="font-semibold text-gray-700 dark:text-gray-300">Sprache:</span>
+                                            <span class="text-gray-600 dark:text-gray-400">{{ ucfirst($book->language) }}</span>
+                                        </div>
+                                    @endif
+
+                                    <div>
+                                        <span class="font-semibold text-gray-700 dark:text-gray-300">Besitzer:</span>
+                                        <span class="text-gray-600 dark:text-gray-400">{{ $book->owner->name }}</span>
+                                    </div>
+
+                                    <div>
+                                        <span class="font-semibold text-gray-700 dark:text-gray-300">Hinzugefügt:</span>
+                                        <span class="text-gray-600 dark:text-gray-400">{{ $book->created_at->format('d.m.Y') }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Description -->
+                                @if($book->description)
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                                            Beschreibung
+                                        </h3>
+                                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+                                            {{ $book->description }}
+                                        </p>
+                                    </div>
+                                @endif
+
+                                <!-- Action Buttons -->
+                                <div class="flex flex-wrap gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                                    @if($book->owner_id === auth()->id())
+                                        <!-- Owner buttons -->
+                                        <a href="{{ route('books.edit', $book) }}" 
+                                           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                            Bearbeiten
+                                        </a>
+                                        
+                                        <form method="POST" action="{{ route('books.destroy', $book) }}" 
+                                              onsubmit="return confirm('Sind Sie sicher, dass Sie dieses Buch löschen möchten?')" 
+                                              class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" 
+                                                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                                Löschen
+                                            </button>
+                                        </form>
+                                    @else
+                                        <!-- Non-owner buttons -->
+                                        @if($book->status === 'verfügbar')
+                                            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                                Ausleihen anfragen
+                                            </button>
+                                        @endif
+                                    @endif
+
+                                    <a href="{{ route('books.index') }}" 
+                                       class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                                        Zurück zur Übersicht
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout> 
