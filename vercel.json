@@ -1,6 +1,7 @@
 {
     "version": 2,
-    "_comment": "Laravel BookShare Vercel Configuration - Updated",
+    "_comment": "Laravel BookShare Vercel Configuration - Force Deploy 2025-06-19",
+    "_timestamp": "2025-06-19T20:15:00Z",
     "builds": [
         {
             "src": "package.json",
