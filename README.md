@@ -1,247 +1,61 @@
-# 📚 BookShare - Laravel Buchverwaltungssystem
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-Ein modernes, vollständiges Buchverwaltungssystem gebaut mit Laravel 11, Breeze-Authentifizierung und einem responsiven Design.
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-![Laravel](https://img.shields.io/badge/Laravel-11.x-red.svg)
-![PHP](https://img.shields.io/badge/PHP-8.2+-blue.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
+## About Laravel
 
-## 🚀 Features
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-### 🔐 Benutzer-Management
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
--   **Laravel Breeze Authentifizierung** - Login, Registrierung, Passwort-Reset
--   **Avatar-Upload** - Profilbilder mit automatischer Größenanpassung
--   **Profil-Bearbeitung** - Vollständige Benutzerdatenverwaltung
--   **E-Mail-Verifizierung** - Sichere Kontoaktivierung
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-### 📖 Bücher-Management
+## Learning Laravel
 
--   **CRUD-Operationen** - Erstellen, Lesen, Bearbeiten, Löschen von Büchern
--   **Cover-Upload** - Buchcover hochladen (max. 2MB)
--   **Detaillierte Metadaten** - Titel, Autor, ISBN, Genre, Jahr, Sprache
--   **Status-Tracking** - Verfügbar, Ausgeliehen, Reserviert
--   **Zustandsbewertung** - 4-stufiges Bewertungssystem
--   **Besitzer-Berechtigungen** - Sichere Zugriffskontrolle
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-### 🎨 Frontend
+You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
 
--   **Responsive Design** - Mobile-first mit Tailwind CSS
--   **Dunkler Modus** - Vollständige Dark-Mode-Unterstützung
--   **Alpine.js** - Interaktive UI-Komponenten
--   **Grid-Layout** - Moderne Buchkarten-Darstellung
--   **Empty States** - Benutzerfreundliche leere Zustände
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-## 📸 Screenshots
+## Laravel Sponsors
 
-### Dashboard
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
-Übersichtliche Statistiken und Schnellzugriff auf wichtige Funktionen.
+### Premium Partners
 
-### Buchsammlung
+- **[Vehikl](https://vehikl.com)**
+- **[Tighten Co.](https://tighten.co)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Redberry](https://redberry.international/laravel-development)**
+- **[Active Logic](https://activelogic.com)**
 
-Responsive Grid-Layout mit Cover-Vorschau und Status-Badges.
+## Contributing
 
-### Buch-Details
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-Umfassende Ansicht mit allen Metadaten und Aktionsmöglichkeiten.
+## Code of Conduct
 
-## 🛠️ Installation
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-### Voraussetzungen
+## Security Vulnerabilities
 
--   PHP 8.2+
--   Composer
--   Node.js & NPM
--   SQLite/MySQL/PostgreSQL
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-### Schritt-für-Schritt Setup
+## License
 
-1. **Repository klonen**
-
-    ```bash
-    git clone https://github.com/[IhrUsername]/bookshare.git
-    cd bookshare
-    ```
-
-2. **Dependencies installieren**
-
-    ```bash
-    composer install
-    npm install
-    ```
-
-3. **Environment konfigurieren**
-
-    ```bash
-    cp .env.example .env
-    php artisan key:generate
-    ```
-
-4. **Datenbank Setup**
-
-    ```bash
-    # Für SQLite (Standard)
-    touch database/database.sqlite
-
-    # .env anpassen für andere Datenbanken
-    php artisan migrate
-    ```
-
-5. **Storage-Link erstellen**
-
-    ```bash
-    php artisan storage:link
-    ```
-
-6. **Frontend Assets kompilieren**
-
-    ```bash
-    npm run dev
-    # oder für Produktion:
-    npm run build
-    ```
-
-7. **Server starten**
-    ```bash
-    php artisan serve
-    ```
-
-Besuchen Sie `http://localhost:8000` und registrieren Sie sich!
-
-## 🗄️ Datenbank-Schema
-
-### Users Tabelle
-
--   `id`, `name`, `email`, `password`
--   `avatar` - Pfad zum Profilbild
--   `email_verified_at`, `remember_token`
-
-### Books Tabelle
-
--   `id`, `title`, `author`, `isbn`
--   `description`, `genre`, `publication_year`
--   `language`, `condition`, `status`
--   `owner_id` (Foreign Key zu users)
--   `image_path` - Pfad zum Buchcover
-
-### Loans Tabelle (vorbereitet für zukünftige Features)
-
--   Ausleihe-System zwischen Benutzern
-
-## 🔗 API Routes
-
-```php
-// Authentifizierte Routen
-GET    /books          # Buchsammlung anzeigen
-GET    /books/create   # Neues Buch Formular
-POST   /books          # Buch speichern
-GET    /books/{id}     # Buchdetails
-GET    /books/{id}/edit # Buch bearbeiten
-PATCH  /books/{id}     # Änderungen speichern
-DELETE /books/{id}     # Buch löschen
-```
-
-## 🎯 Verwendete Technologien
-
-### Backend
-
--   **Laravel 11** - PHP Framework
--   **Laravel Breeze** - Authentifizierung
--   **Eloquent ORM** - Datenbankabstraktion
--   **Laravel Validation** - Eingabevalidierung
-
-### Frontend
-
--   **Blade Templates** - Server-side Rendering
--   **Tailwind CSS** - Utility-first CSS Framework
--   **Alpine.js** - Leichtgewichtige JavaScript-Reaktivität
--   **Heroicons** - Beautiful SVG Icons
-
-### Development
-
--   **Vite** - Frontend Build Tool
--   **PostCSS** - CSS Processing
--   **Laravel Mix** - Asset Compilation
-
-## 🔒 Sicherheit
-
--   **CSRF-Protection** - Alle Formulare geschützt
--   **Mass Assignment Protection** - Fillable-Felder definiert
--   **File Upload Validation** - Sichere Bild-Uploads
--   **Route Model Binding** - Automatische Model-Resolving
--   **Authorization Gates** - Benutzer-spezifische Berechtigung
-
-## 📱 Mobile Optimierung
-
--   **Responsive Breakpoints** - Mobile, Tablet, Desktop
--   **Touch-optimierte Buttons** - Große Touch-Targets
--   **Progressive Enhancement** - Funktioniert ohne JavaScript
--   **Fast Loading** - Optimierte Assets und Queries
-
-## 🚀 Deployment
-
-### Heroku
-
-```bash
-# Heroku CLI installieren, dann:
-heroku create bookshare-app
-git push heroku main
-heroku run php artisan migrate
-```
-
-### Shared Hosting
-
-1. Code in public_html hochladen
-2. `.env` konfigurieren
-3. `composer install --optimize-autoloader --no-dev`
-4. `php artisan migrate`
-5. `php artisan config:cache`
-
-## 🔄 Roadmap
-
-### Geplante Features
-
--   [ ] **Ausleihe-System** - Bücher zwischen Benutzern verleihen
--   [ ] **Suchfunktion** - Volltextsuche und Filter
--   [ ] **Bewertungen** - 5-Sterne-Bewertungssystem
--   [ ] **Wunschliste** - Gewünschte Bücher markieren
--   [ ] **Community-Features** - Öffentliche Buchkataloge
--   [ ] **API-Integration** - ISBN-Lookup für automatische Daten
--   [ ] **Barcode-Scanner** - Mobile ISBN-Erfassung
--   [ ] **Export/Import** - CSV/Excel-Funktionen
-
-### Technische Verbesserungen
-
--   [ ] **Caching** - Redis/Memcached für Performance
--   [ ] **Pagination** - Für große Buchsammlungen
--   [ ] **Image Optimization** - Automatische Bildkompression
--   [ ] **PWA** - Progressive Web App Features
--   [ ] **Real-time Updates** - WebSocket-Integration
-
-## 🤝 Contributing
-
-1. Fork das Repository
-2. Feature Branch erstellen (`git checkout -b feature/AmazingFeature`)
-3. Changes committen (`git commit -m 'Add some AmazingFeature'`)
-4. Branch pushen (`git push origin feature/AmazingFeature`)
-5. Pull Request öffnen
-
-## 📄 Lizenz
-
-Dieses Projekt steht unter der MIT-Lizenz. Siehe `LICENSE` Datei für Details.
-
-## 👥 Credits
-
--   **Laravel Framework** - [laravel.com](https://laravel.com)
--   **Tailwind CSS** - [tailwindcss.com](https://tailwindcss.com)
--   **Alpine.js** - [alpinejs.dev](https://alpinejs.dev)
--   **Heroicons** - [heroicons.com](https://heroicons.com)
-
-## 📧 Kontakt
-
-Bei Fragen oder Anregungen können Sie gerne ein Issue erstellen oder sich direkt melden.
-
----
-
-⭐ **Gefällt Ihnen das Projekt? Geben Sie uns einen Stern!** ⭐
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
