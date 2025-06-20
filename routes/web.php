@@ -17,6 +17,11 @@ Route::get('/test-images', function () {
     return view('test-images');
 })->name('test-images');
 
+// Debug route for rating system
+Route::get('/debug-rating', function () {
+    return view('debug-rating');
+})->middleware('auth')->name('debug-rating');
+
 // Public pages
 Route::get('/about', function () {
     return view('pages.about');

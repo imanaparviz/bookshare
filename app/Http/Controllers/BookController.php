@@ -91,7 +91,6 @@ class BookController extends Controller
         $recentRatings = $book
             ->ratings()
             ->with('user')
-            ->withReview()
             ->latest()
             ->limit(5)
             ->get();

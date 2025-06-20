@@ -7,6 +7,7 @@ use App\Models\Rating;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class RatingController extends Controller
@@ -16,6 +17,16 @@ class RatingController extends Controller
      */
     public function store(Request $request, Book $book): RedirectResponse
     {
+        // Debug logging
+        Log::info('🔍 [RATING DEBUG] === Rating Store Request ===');
+        Log::info('🔍 [RATING DEBUG] User ID: ' . Auth::id());
+        Log::info('🔍 [RATING DEBUG] Book ID: ' . $book->id);
+        Log::info('🔍 [RATING DEBUG] Request Data: ', $request->all());
+        Log::info('🔍 [RATING DEBUG] is_anonymous raw: ' . ($request->get('is_anonymous') ?? 'NULL'));
+        Log::info('🔍 [RATING DEBUG] is_anonymous boolean: ' . ($request->boolean('is_anonymous') ? 'TRUE' : 'FALSE'));
+        Log::info('🔍 [RATING DEBUG] Rating: ' . $request->rating);
+        Log::info('🔍 [RATING DEBUG] Review: ' . ($request->review ?? 'NULL'));
+
         $request->validate(Rating::validationRules());
 
         // Check if user already rated this book
@@ -28,18 +39,23 @@ class RatingController extends Controller
                 'review' => $request->review,
                 'is_anonymous' => $request->boolean('is_anonymous', false),
             ]);
+            Log::info('🔍 [RATING DEBUG] Updated existing rating ID: ' . $existingRating->id);
             $message = 'Ihre Bewertung wurde erfolgreich aktualisiert!';
         } else {
             // Create new rating
-            Rating::create([
+            $newRating = Rating::create([
                 'user_id' => Auth::id(),
                 'book_id' => $book->id,
                 'rating' => $request->rating,
                 'review' => $request->review,
                 'is_anonymous' => $request->boolean('is_anonymous', false),
             ]);
+            Log::info('🔍 [RATING DEBUG] Created new rating ID: ' . $newRating->id);
+            Log::info('🔍 [RATING DEBUG] New rating data: ', $newRating->toArray());
             $message = 'Vielen Dank für Ihre Bewertung!';
         }
+
+        Log::info('🔍 [RATING DEBUG] === Rating Store Completed ===');
 
         return back()->with('success', $message);
     }

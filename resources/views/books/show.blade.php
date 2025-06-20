@@ -235,11 +235,11 @@
                                                                 <div class="flex-shrink-0">
                                                                     @if($rating->user->avatar && !$rating->is_anonymous)
                                                                         <img src="{{ asset('storage/' . $rating->user->avatar) }}" 
-                                                                             alt="{{ $rating->reviewer_name }}" 
+                                                                             alt="{{ $rating->is_anonymous ? 'Anonym' : $rating->user->name }}" 
                                                                              class="h-8 w-8 rounded-full">
                                                                     @else
-                                                                        <div class="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                                                                            <span class="text-xs font-medium text-gray-600">
+                                                                        <div class="h-8 w-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                                                                            <span class="text-xs font-medium text-gray-600 dark:text-gray-300">
                                                                                 {{ $rating->is_anonymous ? '?' : strtoupper(substr($rating->user->name, 0, 1)) }}
                                                                             </span>
                                                                         </div>
@@ -248,8 +248,17 @@
                                                                 <div>
                                                                     <div class="flex items-center space-x-2">
                                                                         <span class="font-medium text-gray-900 dark:text-gray-100">
-                                                                            {{ $rating->reviewer_name }}
+                                                                            @if($rating->is_anonymous)
+                                                                                Anonym
+                                                                            @else
+                                                                                {{ $rating->user->name }}
+                                                                            @endif
                                                                         </span>
+                                                                        @if($rating->is_anonymous)
+                                                                            <span class="inline-block px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded-full">
+                                                                                Anonym
+                                                                            </span>
+                                                                        @endif
                                                                         <x-star-rating 
                                                                             :rating="$rating->rating" 
                                                                             size="sm" 

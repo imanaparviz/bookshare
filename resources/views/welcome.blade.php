@@ -949,11 +949,24 @@
                 console.log('🚀 [OpenAI] Success flag:', data.success);
                 console.log('🚀 [OpenAI] Total recommendations found:', data.total_found);
                 console.log('🚀 [OpenAI] Analysis type:', data.analysis_type);
-                console.log('🚀 [OpenAI] Recommendations array length:', data.recommendations?.length || 0);
+                // Convert recommendations to array if it's an object
+                let recommendationsArray = [];
+                if (data.recommendations) {
+                    if (Array.isArray(data.recommendations)) {
+                        recommendationsArray = data.recommendations;
+                    } else if (typeof data.recommendations === 'object') {
+                        // Convert object to array
+                        recommendationsArray = Object.values(data.recommendations);
+                    }
+                }
                 
-                if (data.recommendations && data.recommendations.length > 0) {
+                console.log('🚀 [OpenAI] Recommendations array length:', recommendationsArray.length);
+                console.log('🚀 [OpenAI] Recommendations type:', typeof data.recommendations);
+                console.log('🚀 [OpenAI] Is array:', Array.isArray(data.recommendations));
+                
+                if (recommendationsArray.length > 0) {
                     console.log('🚀 [OpenAI] --- ANALYZING INDIVIDUAL RECOMMENDATIONS ---');
-                    data.recommendations.forEach((rec, index) => {
+                    recommendationsArray.forEach((rec, index) => {
                         console.log(`🚀 [OpenAI] Recommendation ${index + 1}:`, {
                             bookTitle: rec.book?.title,
                             bookAuthor: rec.book?.author,
@@ -966,7 +979,7 @@
                     });
                 }
                 
-                if (data.success && data.recommendations.length > 0) {
+                if (data.success && recommendationsArray.length > 0) {
                     console.log('🚀 [OpenAI] --- RENDERING RESULTS ---');
                     
                     // Clear previous results
@@ -978,7 +991,7 @@
                     console.log('🚀 [OpenAI] Results area made visible');
                     
                     // Add recommendations to grid
-                    data.recommendations.forEach((rec, index) => {
+                    recommendationsArray.forEach((rec, index) => {
                         console.log(`🚀 [OpenAI] Creating card ${index + 1} for:`, rec.book?.title);
                         const bookCard = createAIBookCard(rec);
                         grid.appendChild(bookCard);

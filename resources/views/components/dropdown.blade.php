@@ -4,11 +4,15 @@
 $alignmentClasses = match ($align) {
     'left' => 'ltr:origin-top-left rtl:origin-top-right start-0',
     'top' => 'origin-top',
-    default => 'ltr:origin-top-right rtl:origin-top-left end-0',
+    default => 'ltr:origin-top-right rtl:origin-top-left end-0 sm:end-0',
 };
 
 $width = match ($width) {
     '48' => 'w-48',
+    '64' => 'w-64',
+    '72' => 'w-72',
+    '80' => 'w-80',
+    '96' => 'w-96',
     default => $width,
 };
 @endphp
@@ -25,8 +29,8 @@ $width = match ($width) {
             x-transition:leave="transition ease-in duration-75"
             x-transition:leave-start="opacity-100 scale-100"
             x-transition:leave-end="opacity-0 scale-95"
-            class="absolute z-50 mt-2 {{ $width }} rounded-md shadow-lg {{ $alignmentClasses }}"
-            style="display: none;"
+            class="absolute z-50 mt-2 {{ $width }} rounded-md shadow-lg {{ $alignmentClasses }} max-w-xs"
+            style="display: none; max-height: 80vh; overflow-y: auto;"
             @click="open = false">
         <div class="rounded-md ring-1 ring-black ring-opacity-5 {{ $contentClasses }}">
             {{ $content }}

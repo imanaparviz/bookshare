@@ -195,7 +195,7 @@ class WelcomeController extends Controller
                         'recommendation_source' => $item['recommendation_source'] ?? '🤖 OpenAI',
                         'ai_summary' => $this->recommendationService->generateAIBookSummary($item['book'])
                     ];
-                })
+                })->values()->toArray()  // Ensure it's a proper array
             ];
 
             Log::info('🤖 [OpenAI] Response prepared with ' . count($response['recommendations']) . ' recommendations');

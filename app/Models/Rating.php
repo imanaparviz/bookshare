@@ -59,7 +59,7 @@ class Rating extends Model
 
     public function getReviewerNameAttribute()
     {
-        return $this->is_anonymous ? 'Anonymer Benutzer' : $this->user->name;
+        return $this->is_anonymous ? 'Anonym' : $this->user->name;
     }
 
     public static function getAverageRating($bookId)
