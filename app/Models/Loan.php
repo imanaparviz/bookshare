@@ -8,6 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Loan extends Model
 {
+    // Status constants
+    const STATUS_ANGEFRAGT = 'angefragt';
+    const STATUS_AKTIV = 'aktiv';
+    const STATUS_ABGELEHNT = 'abgelehnt';
+    const STATUS_ZURUECKGEGEBEN = 'zurückgegeben';
+    const STATUS_UEBERFAELLIG = 'überfällig';
+
     protected $fillable = [
         'book_id',
         'borrower_id',
@@ -44,29 +51,41 @@ class Loan extends Model
     // Scopes
     public function scopeActive($query)
     {
-        return $query->where('status', 'aktiv');
+        return $query->where('status', self::STATUS_AKTIV);
     }
 
     public function scopePending($query)
     {
-        return $query->where('status', 'angefragt');
+        return $query->where('status', self::STATUS_ANGEFRAGT);
     }
 
     public function scopeOverdue($query)
     {
         return $query
             ->where('due_date', '<', Carbon::now())
-            ->where('status', 'aktiv');
+            ->where('status', self::STATUS_AKTIV);
     }
 
     public function scopeReturned($query)
     {
-        return $query->where('status', 'zurückgegeben');
+        return $query->where('status', self::STATUS_ZURUECKGEGEBEN);
     }
 
     // Accessors
     public function getIsOverdueAttribute()
     {
-        return $this->status === 'aktiv' && $this->due_date < Carbon::now();
+        return $this->status === self::STATUS_AKTIV && $this->due_date < Carbon::now();
+    }
+
+    // Helper methods
+    public static function getStatusOptions()
+    {
+        return [
+            self::STATUS_ANGEFRAGT => 'Angefragt',
+            self::STATUS_AKTIV => 'Aktiv',
+            self::STATUS_ABGELEHNT => 'Abgelehnt',
+            self::STATUS_ZURUECKGEGEBEN => 'Zurückgegeben',
+            self::STATUS_UEBERFAELLIG => 'Überfällig',
+        ];
     }
 }

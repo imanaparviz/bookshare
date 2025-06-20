@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Book extends Model
 {
+    // Status constants
+    const STATUS_VERFUEGBAR = 'verfügbar';
+    const STATUS_AUSGELIEHEN = 'ausgeliehen';
+    const STATUS_RESERVIERT = 'reserviert';
+    const STATUS_ANGEFRAGT = 'angefragt';  // Neu hinzugefügt für Leihantrag
+
     protected $fillable = [
         'title',
         'author',
@@ -45,11 +51,22 @@ class Book extends Model
     // Scopes
     public function scopeAvailable($query)
     {
-        return $query->where('status', 'verfügbar');
+        return $query->where('status', self::STATUS_VERFUEGBAR);
     }
 
     public function scopeByGenre($query, $genre)
     {
         return $query->where('genre', $genre);
+    }
+
+    // Helper methods
+    public static function getStatusOptions()
+    {
+        return [
+            self::STATUS_VERFUEGBAR => 'Verfügbar',
+            self::STATUS_ANGEFRAGT => 'Angefragt',
+            self::STATUS_AUSGELIEHEN => 'Ausgeliehen',
+            self::STATUS_RESERVIERT => 'Reserviert',
+        ];
     }
 }
