@@ -5,8 +5,8 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" class="flex items-center space-x-3">
-                        <x-application-logo class="block h-10 w-auto fill-current text-indigo-600 dark:text-indigo-400" />
+                    <a href="{{ url('/') }}" class="flex items-center space-x-3 hover:scale-105 transition-transform duration-200">
+                        <div class="text-3xl">❤️</div>
                         <span class="text-xl font-bold text-gray-800 dark:text-gray-200 hidden md:block">BookShare</span>
                     </a>
                 </div>
@@ -38,14 +38,30 @@
             <!-- User Area -->
             <div class="hidden sm:flex sm:items-center sm:ms-6 space-x-4">
                 <!-- Notifications Bell -->
-                <button class="relative bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-yellow-400 dark:hover:border-yellow-400 p-3 rounded-xl shadow-md hover:shadow-lg text-gray-700 dark:text-gray-200 hover:text-yellow-600 dark:hover:text-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50 transition-all duration-200 transform hover:scale-105">
-                    <span class="sr-only">Benachrichtigungen anzeigen</span>
+                @php
+                    // Anfragen an mich (als Lender) - Bücher die andere von mir ausleihen wollen
+                    $lenderRequestsCount = \App\Models\Loan::where('lender_id', Auth::id())
+                        ->where('status', \App\Models\Loan::STATUS_ANGEFRAGT)
+                        ->count();
+                    
+                    // Meine Anfragen (als Borrower) - Bücher die ich ausleihen möchte/habe
+                    $borrowerRequestsCount = \App\Models\Loan::where('borrower_id', Auth::id())
+                        ->whereIn('status', [\App\Models\Loan::STATUS_ANGEFRAGT, \App\Models\Loan::STATUS_AKTIV])
+                        ->count();
+                    
+                    // Gesamtanzahl aller aktiven Loan-Aktivitäten
+                    $totalLoansCount = $lenderRequestsCount + $borrowerRequestsCount;
+                @endphp
+                <a href="{{ route('loans.index') }}" class="relative bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-yellow-400 dark:hover:border-yellow-400 p-3 rounded-xl shadow-md hover:shadow-lg text-gray-700 dark:text-gray-200 hover:text-yellow-600 dark:hover:text-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50 transition-all duration-200 transform hover:scale-105">
+                    <span class="sr-only">Alle Ausleihaktivitäten anzeigen</span>
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
                     </svg>
-                    <!-- Notification dot (if notifications exist) -->
-                    <span class="absolute -top-1 -right-1 block h-4 w-4 rounded-full bg-red-500 border-2 border-white dark:border-gray-800 text-xs text-white font-bold flex items-center justify-center animate-pulse">3</span>
-                </button>
+                    <!-- Notification count (if any loans exist) -->
+                    @if($totalLoansCount > 0)
+                        <span class="absolute -top-1 -right-1 block h-4 w-4 rounded-full bg-red-500 border-2 border-white dark:border-gray-800 text-xs text-white font-bold flex items-center justify-center animate-pulse">{{ $totalLoansCount }}</span>
+                    @endif
+                </a>
 
                 <!-- User Profile Dropdown -->
                 <x-dropdown align="right" width="64">
@@ -168,8 +184,33 @@
                 </x-dropdown>
             </div>
 
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
+            <!-- Mobile Notifications and Hamburger -->
+            <div class="flex items-center space-x-2 sm:hidden">
+                <!-- Mobile Notifications Bell -->
+                @php
+                    // Anfragen an mich (als Lender) - Bücher die andere von mir ausleihen wollen
+                    $lenderRequestsCount = \App\Models\Loan::where('lender_id', Auth::id())
+                        ->where('status', \App\Models\Loan::STATUS_ANGEFRAGT)
+                        ->count();
+                    
+                    // Meine Anfragen (als Borrower) - Bücher die ich ausleihen möchte/habe
+                    $borrowerRequestsCount = \App\Models\Loan::where('borrower_id', Auth::id())
+                        ->whereIn('status', [\App\Models\Loan::STATUS_ANGEFRAGT, \App\Models\Loan::STATUS_AKTIV])
+                        ->count();
+                    
+                    // Gesamtanzahl aller aktiven Loan-Aktivitäten
+                    $totalLoansCount = $lenderRequestsCount + $borrowerRequestsCount;
+                @endphp
+                <a href="{{ route('loans.index') }}" class="relative bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-yellow-400 dark:hover:border-yellow-400 p-2 rounded-lg shadow-md text-gray-700 dark:text-gray-200 hover:text-yellow-600 dark:hover:text-yellow-400 transition-all duration-200">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+                    </svg>
+                    @if($totalLoansCount > 0)
+                        <span class="absolute -top-1 -right-1 block h-4 w-4 rounded-full bg-red-500 border-2 border-white dark:border-gray-800 text-xs text-white font-bold flex items-center justify-center animate-pulse">{{ $totalLoansCount }}</span>
+                    @endif
+                </a>
+                
+                <!-- Hamburger -->
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />

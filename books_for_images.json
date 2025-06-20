@@ -1,0 +1,586 @@
+{
+    "books_for_images": [
+        {
+            "id": 1,
+            "title": "Der Herr der Ringe: Die Gefährten",
+            "author": "J.R.R. Tolkien",
+            "genre": "Fantasy",
+            "suggested_filename": "01_herr_der_ringe_die_gefaehrten.jpg",
+            "has_existing_image": true,
+            "description": "Epic fantasy adventure"
+        },
+        {
+            "id": 2,
+            "title": "Dune - Der Wüstenplanet",
+            "author": "Frank Herbert",
+            "genre": "Science Fiction",
+            "suggested_filename": "02_dune_der_wuestenplanet.jpg",
+            "has_existing_image": true,
+            "description": "Sci-fi masterpiece"
+        },
+        {
+            "id": 3,
+            "title": "Harry Potter und der Stein der Weisen",
+            "author": "J.K. Rowling",
+            "genre": "Fantasy",
+            "suggested_filename": "03_harry_potter_stein_der_weisen.jpg",
+            "has_existing_image": true,
+            "description": "Wizarding world adventure"
+        },
+        {
+            "id": 4,
+            "title": "Foundation - Der Psychohistoriker",
+            "author": "Isaac Asimov",
+            "genre": "Science Fiction",
+            "suggested_filename": "04_foundation_der_psychohistoriker.jpg",
+            "has_existing_image": true,
+            "description": "Galactic empire sci-fi"
+        },
+        {
+            "id": 5,
+            "title": "Das Lied von Eis und Feuer - Die Herren von Winterfell",
+            "author": "George R.R. Martin",
+            "genre": "Fantasy",
+            "suggested_filename": "05_das_lied_von_eis_und_feuer.jpg",
+            "has_existing_image": true,
+            "description": "Game of Thrones fantasy"
+        },
+        {
+            "id": 6,
+            "title": "1984",
+            "author": "George Orwell",
+            "genre": "Dystopie",
+            "suggested_filename": "06_1984_george_orwell.jpg",
+            "has_existing_image": true,
+            "description": "Dystopian surveillance state"
+        },
+        {
+            "id": 7,
+            "title": "Stolz und Vorurteil",
+            "author": "Jane Austen",
+            "genre": "Klassiker",
+            "suggested_filename": "07_stolz_und_vorurteil.jpg",
+            "has_existing_image": true,
+            "description": "Classic romance novel"
+        },
+        {
+            "id": 8,
+            "title": "Die Verwandlung",
+            "author": "Franz Kafka",
+            "genre": "Klassiker",
+            "suggested_filename": "08_die_verwandlung_kafka.jpg",
+            "has_existing_image": true,
+            "description": "Surreal transformation story"
+        },
+        {
+            "id": 9,
+            "title": "Der große Gatsby",
+            "author": "F. Scott Fitzgerald",
+            "genre": "Klassiker",
+            "suggested_filename": "09_der_grosse_gatsby.jpg",
+            "has_existing_image": true,
+            "description": "American literature classic"
+        },
+        {
+            "id": 10,
+            "title": "Gone Girl - Das perfekte Opfer",
+            "author": "Gillian Flynn",
+            "genre": "Thriller",
+            "suggested_filename": "10_gone_girl_das_perfekte_opfer.jpg",
+            "has_existing_image": true,
+            "description": "Psychological thriller"
+        },
+        {
+            "id": 11,
+            "title": "Der Schwarm",
+            "author": "Frank Schätzing",
+            "genre": "Thriller",
+            "suggested_filename": "11_der_schwarm_frank_schaetzing.jpg",
+            "has_existing_image": true,
+            "description": "Eco-thriller"
+        },
+        {
+            "id": 12,
+            "title": "Millennium - Verblendung",
+            "author": "Stieg Larsson",
+            "genre": "Krimi",
+            "suggested_filename": "12_millennium_verblendung_stieg_larsson.jpg",
+            "has_existing_image": true,
+            "description": "Swedish crime novel"
+        },
+        {
+            "id": 13,
+            "title": "Clean Code",
+            "author": "Robert C. Martin",
+            "genre": "Sachbuch",
+            "suggested_filename": "13_clean_code_robert_martin.jpg",
+            "has_existing_image": true,
+            "description": "Software development guide"
+        },
+        {
+            "id": 14,
+            "title": "Sapiens - Eine kurze Geschichte der Menschheit",
+            "author": "Yuval Noah Harari",
+            "genre": "Sachbuch",
+            "suggested_filename": "14_sapiens_yuval_harari.jpg",
+            "has_existing_image": true,
+            "description": "Human history overview"
+        },
+        {
+            "id": 15,
+            "title": "Atomic Habits",
+            "author": "James Clear",
+            "genre": "Ratgeber",
+            "suggested_filename": "15_atomic_habits_james_clear.jpg",
+            "has_existing_image": true,
+            "description": "Habit formation guide"
+        },
+        {
+            "id": 16,
+            "title": "Die Känguru-Chroniken",
+            "author": "Marc-Uwe Kling",
+            "genre": "Humor",
+            "suggested_filename": "16_kaenguru_chroniken_marc_uwe_kling.jpg",
+            "has_existing_image": true,
+            "description": "Humorous stories"
+        },
+        {
+            "id": 17,
+            "title": "Der Hundertjährige, der aus dem Fenster stieg",
+            "author": "Jonas Jonasson",
+            "genre": "Humor",
+            "suggested_filename": "17_der_hundertjaehrige_jonas_jonasson.jpg",
+            "has_existing_image": true,
+            "description": "Humorous adventure"
+        },
+        {
+            "id": 18,
+            "title": "Tschick",
+            "author": "Wolfgang Herrndorf",
+            "genre": "Jugendbuch",
+            "suggested_filename": "18_tschick_wolfgang_herrndorf.jpg",
+            "has_existing_image": true,
+            "description": "Coming-of-age road trip"
+        },
+        {
+            "id": 19,
+            "title": "Steve Jobs",
+            "author": "Walter Isaacson",
+            "genre": "Biografie",
+            "suggested_filename": "19_steve_jobs_walter_isaacson.jpg",
+            "has_existing_image": true,
+            "description": "Apple founder biography"
+        },
+        {
+            "id": 20,
+            "title": "Becoming - Meine Geschichte",
+            "author": "Michelle Obama",
+            "genre": "Biografie",
+            "suggested_filename": "20_becoming_michelle_obama.jpg",
+            "has_existing_image": true,
+            "description": "Former First Lady memoir"
+        },
+        {
+            "id": 21,
+            "title": "Salt, Fat, Acid, Heat",
+            "author": "Samin Nosrat",
+            "genre": "Kochbuch",
+            "suggested_filename": "21_salt_fat_acid_heat_samin_nosrat.jpg",
+            "has_existing_image": true,
+            "description": "Cooking fundamentals"
+        },
+        {
+            "id": 22,
+            "title": "Der Name des Windes",
+            "author": "Patrick Rothfuss",
+            "genre": "Fantasy",
+            "suggested_filename": "22_der_name_des_windes_patrick_rothfuss.jpg",
+            "has_existing_image": false,
+            "description": "Fantasy epic about Kvothe"
+        },
+        {
+            "id": 23,
+            "title": "Die Farbe der Magie",
+            "author": "Terry Pratchett",
+            "genre": "Fantasy",
+            "suggested_filename": "23_die_farbe_der_magie_terry_pratchett.jpg",
+            "has_existing_image": false,
+            "description": "Humorous fantasy satire"
+        },
+        {
+            "id": 24,
+            "title": "Eragon - Das Vermächtnis der Drachenreiter",
+            "author": "Christopher Paolini",
+            "genre": "Fantasy",
+            "suggested_filename": "24_eragon_das_vermaechtnis_der_drachenreiter.jpg",
+            "has_existing_image": false,
+            "description": "Dragon rider adventure"
+        },
+        {
+            "id": 25,
+            "title": "Der Hobbit",
+            "author": "J.R.R. Tolkien",
+            "genre": "Fantasy",
+            "suggested_filename": "25_der_hobbit_tolkien.jpg",
+            "has_existing_image": false,
+            "description": "Bilbo's unexpected journey"
+        },
+        {
+            "id": 26,
+            "title": "Die Klinge des Schicksals",
+            "author": "Joe Abercrombie",
+            "genre": "Fantasy",
+            "suggested_filename": "26_die_klinge_des_schicksals_joe_abercrombie.jpg",
+            "has_existing_image": false,
+            "description": "Dark fantasy novel"
+        },
+        {
+            "id": 27,
+            "title": "Neuromancer",
+            "author": "William Gibson",
+            "genre": "Science Fiction",
+            "suggested_filename": "27_neuromancer_william_gibson.jpg",
+            "has_existing_image": false,
+            "description": "Cyberpunk classic"
+        },
+        {
+            "id": 28,
+            "title": "Blade Runner - Träumen Androiden von elektrischen Schafen?",
+            "author": "Philip K. Dick",
+            "genre": "Science Fiction",
+            "suggested_filename": "28_blade_runner_philip_k_dick.jpg",
+            "has_existing_image": false,
+            "description": "Replicant identity thriller"
+        },
+        {
+            "id": 29,
+            "title": "Der Marsianer",
+            "author": "Andy Weir",
+            "genre": "Science Fiction",
+            "suggested_filename": "29_der_marsianer_andy_weir.jpg",
+            "has_existing_image": false,
+            "description": "Mars survival story"
+        },
+        {
+            "id": 30,
+            "title": "Enders Spiel",
+            "author": "Orson Scott Card",
+            "genre": "Science Fiction",
+            "suggested_filename": "30_enders_spiel_orson_scott_card.jpg",
+            "has_existing_image": false,
+            "description": "Military sci-fi about child genius"
+        },
+        {
+            "id": 31,
+            "title": "Per Anhalter durch die Galaxis",
+            "author": "Douglas Adams",
+            "genre": "Science Fiction",
+            "suggested_filename": "31_per_anhalter_durch_die_galaxis_douglas_adams.jpg",
+            "has_existing_image": false,
+            "description": "Humorous space adventure"
+        },
+        {
+            "id": 32,
+            "title": "Wer die Nachtigall stört",
+            "author": "Harper Lee",
+            "genre": "Klassiker",
+            "suggested_filename": "32_wer_die_nachtigall_stoert_harper_lee.jpg",
+            "has_existing_image": false,
+            "description": "Southern racism and morality"
+        },
+        {
+            "id": 33,
+            "title": "Die Fänger im Roggen",
+            "author": "J.D. Salinger",
+            "genre": "Klassiker",
+            "suggested_filename": "33_die_faenger_im_roggen_salinger.jpg",
+            "has_existing_image": false,
+            "description": "Rebellious teenager story"
+        },
+        {
+            "id": 34,
+            "title": "Brave New World",
+            "author": "Aldous Huxley",
+            "genre": "Dystopie",
+            "suggested_filename": "34_brave_new_world_aldous_huxley.jpg",
+            "has_existing_image": false,
+            "description": "Controlled society dystopia"
+        },
+        {
+            "id": 35,
+            "title": "The Silent Patient",
+            "author": "Alex Michaelides",
+            "genre": "Thriller",
+            "suggested_filename": "35_the_silent_patient_alex_michaelides.jpg",
+            "has_existing_image": false,
+            "description": "Psychological thriller about silence"
+        },
+        {
+            "id": 36,
+            "title": "Shutter Island",
+            "author": "Dennis Lehane",
+            "genre": "Thriller",
+            "suggested_filename": "36_shutter_island_dennis_lehane.jpg",
+            "has_existing_image": false,
+            "description": "Mysterious island thriller"
+        },
+        {
+            "id": 37,
+            "title": "Der Talentierte Mr. Ripley",
+            "author": "Patricia Highsmith",
+            "genre": "Thriller",
+            "suggested_filename": "37_der_talentierte_mr_ripley_patricia_highsmith.jpg",
+            "has_existing_image": false,
+            "description": "Charming con artist thriller"
+        },
+        {
+            "id": 38,
+            "title": "The Power of Now",
+            "author": "Eckhart Tolle",
+            "genre": "Ratgeber",
+            "suggested_filename": "38_the_power_of_now_eckhart_tolle.jpg",
+            "has_existing_image": false,
+            "description": "Spiritual present-moment guide"
+        },
+        {
+            "id": 39,
+            "title": "Thinking, Fast and Slow",
+            "author": "Daniel Kahneman",
+            "genre": "Sachbuch",
+            "suggested_filename": "39_thinking_fast_and_slow_daniel_kahneman.jpg",
+            "has_existing_image": false,
+            "description": "Cognitive psychology insights"
+        },
+        {
+            "id": 40,
+            "title": "Qualityland",
+            "author": "Marc-Uwe Kling",
+            "genre": "Humor",
+            "suggested_filename": "40_qualityland_marc_uwe_kling.jpg",
+            "has_existing_image": false,
+            "description": "Satirical dystopian comedy"
+        },
+        {
+            "id": 41,
+            "title": "Einstein - Sein Leben und sein Universum",
+            "author": "Walter Isaacson",
+            "genre": "Biografie",
+            "suggested_filename": "41_einstein_sein_leben_und_sein_universum_walter_isaacson.jpg",
+            "has_existing_image": false,
+            "description": "Physicist biography"
+        },
+        {
+            "id": 42,
+            "title": "Das perfekte Dinner",
+            "author": "Gordon Ramsay",
+            "genre": "Kochbuch",
+            "suggested_filename": "42_das_perfekte_dinner_gordon_ramsay.jpg",
+            "has_existing_image": false,
+            "description": "Special occasion recipes"
+        },
+        {
+            "id": 43,
+            "title": "Es",
+            "author": "Stephen King",
+            "genre": "Horror",
+            "suggested_filename": "43_es_stephen_king.jpg",
+            "has_existing_image": false,
+            "description": "Classic horror about Pennywise"
+        },
+        {
+            "id": 44,
+            "title": "Dracula",
+            "author": "Bram Stoker",
+            "genre": "Horror",
+            "suggested_filename": "44_dracula_bram_stoker.jpg",
+            "has_existing_image": false,
+            "description": "Classic vampire novel"
+        },
+        {
+            "id": 45,
+            "title": "Me Before You",
+            "author": "Jojo Moyes",
+            "genre": "Romance",
+            "suggested_filename": "45_me_before_you_jojo_moyes.jpg",
+            "has_existing_image": false,
+            "description": "Moving love story"
+        },
+        {
+            "id": 46,
+            "title": "Ein ganzes halbes Jahr",
+            "author": "Jojo Moyes",
+            "genre": "Romance",
+            "suggested_filename": "46_ein_ganzes_halbes_jahr_jojo_moyes.jpg",
+            "has_existing_image": false,
+            "description": "Love story continuation"
+        },
+        {
+            "id": 47,
+            "title": "Der Da Vinci Code",
+            "author": "Dan Brown",
+            "genre": "Mystery",
+            "suggested_filename": "47_der_da_vinci_code_dan_brown.jpg",
+            "has_existing_image": false,
+            "description": "Religious symbols thriller"
+        },
+        {
+            "id": 48,
+            "title": "Mord im Orientexpress",
+            "author": "Agatha Christie",
+            "genre": "Mystery",
+            "suggested_filename": "48_mord_im_orientexpress_agatha_christie.jpg",
+            "has_existing_image": false,
+            "description": "Classic Hercule Poirot mystery"
+        },
+        {
+            "id": 49,
+            "title": "Die Säulen der Erde",
+            "author": "Ken Follett",
+            "genre": "Historischer Roman",
+            "suggested_filename": "49_die_saeulen_der_erde_ken_follett.jpg",
+            "has_existing_image": false,
+            "description": "Medieval cathedral building"
+        },
+        {
+            "id": 50,
+            "title": "Die Wanderhure",
+            "author": "Iny Lorentz",
+            "genre": "Historischer Roman",
+            "suggested_filename": "50_die_wanderhure_iny_lorentz.jpg",
+            "has_existing_image": false,
+            "description": "Medieval German historical fiction"
+        },
+        {
+            "id": 51,
+            "title": "Sophies Welt",
+            "author": "Jostein Gaarder",
+            "genre": "Philosophie",
+            "suggested_filename": "51_sophies_welt_jostein_gaarder.jpg",
+            "has_existing_image": false,
+            "description": "Philosophy history novel"
+        },
+        {
+            "id": 52,
+            "title": "Eat, Pray, Love",
+            "author": "Elizabeth Gilbert",
+            "genre": "Reise",
+            "suggested_filename": "52_eat_pray_love_elizabeth_gilbert.jpg",
+            "has_existing_image": false,
+            "description": "Self-discovery travel memoir"
+        },
+        {
+            "id": 53,
+            "title": "Wild",
+            "author": "Cheryl Strayed",
+            "genre": "Reise",
+            "suggested_filename": "53_wild_cheryl_strayed.jpg",
+            "has_existing_image": false,
+            "description": "Therapeutic hiking memoir"
+        },
+        {
+            "id": 54,
+            "title": "21 Lektionen für das 21. Jahrhundert",
+            "author": "Yuval Noah Harari",
+            "genre": "Sachbuch",
+            "suggested_filename": "54_21_lektionen_fuer_das_21_jahrhundert_yuval_harari.jpg",
+            "has_existing_image": false,
+            "description": "Contemporary challenges analysis"
+        },
+        {
+            "id": 55,
+            "title": "The 7 Habits of Highly Effective People",
+            "author": "Stephen R. Covey",
+            "genre": "Ratgeber",
+            "suggested_filename": "55_the_7_habits_of_highly_effective_people_stephen_covey.jpg",
+            "has_existing_image": false,
+            "description": "Personal effectiveness guide"
+        }
+    ],
+    "image_categories": {
+        "existing_images": [
+            "01_herr_der_ringe_die_gefaehrten.jpg",
+            "02_dune_der_wuestenplanet.jpg",
+            "03_harry_potter_stein_der_weisen.jpg",
+            "04_foundation_der_psychohistoriker.jpg",
+            "05_das_lied_von_eis_und_feuer.jpg",
+            "06_1984_george_orwell.jpg",
+            "07_stolz_und_vorurteil.jpg",
+            "08_die_verwandlung_kafka.jpg",
+            "09_der_grosse_gatsby.jpg",
+            "10_gone_girl_das_perfekte_opfer.jpg",
+            "11_der_schwarm_frank_schaetzing.jpg",
+            "12_millennium_verblendung_stieg_larsson.jpg",
+            "13_clean_code_robert_martin.jpg",
+            "14_sapiens_yuval_harari.jpg",
+            "15_atomic_habits_james_clear.jpg",
+            "16_kaenguru_chroniken_marc_uwe_kling.jpg",
+            "17_der_hundertjaehrige_jonas_jonasson.jpg",
+            "18_tschick_wolfgang_herrndorf.jpg",
+            "19_steve_jobs_walter_isaacson.jpg",
+            "20_becoming_michelle_obama.jpg",
+            "21_salt_fat_acid_heat_samin_nosrat.jpg"
+        ],
+        "needed_images": [
+            "22_der_name_des_windes_patrick_rothfuss.jpg",
+            "23_die_farbe_der_magie_terry_pratchett.jpg",
+            "24_eragon_das_vermaechtnis_der_drachenreiter.jpg",
+            "25_der_hobbit_tolkien.jpg",
+            "26_die_klinge_des_schicksals_joe_abercrombie.jpg",
+            "27_neuromancer_william_gibson.jpg",
+            "28_blade_runner_philip_k_dick.jpg",
+            "29_der_marsianer_andy_weir.jpg",
+            "30_enders_spiel_orson_scott_card.jpg",
+            "31_per_anhalter_durch_die_galaxis_douglas_adams.jpg",
+            "32_wer_die_nachtigall_stoert_harper_lee.jpg",
+            "33_die_faenger_im_roggen_salinger.jpg",
+            "34_brave_new_world_aldous_huxley.jpg",
+            "35_the_silent_patient_alex_michaelides.jpg",
+            "36_shutter_island_dennis_lehane.jpg",
+            "37_der_talentierte_mr_ripley_patricia_highsmith.jpg",
+            "38_the_power_of_now_eckhart_tolle.jpg",
+            "39_thinking_fast_and_slow_daniel_kahneman.jpg",
+            "40_qualityland_marc_uwe_kling.jpg",
+            "41_einstein_sein_leben_und_sein_universum_walter_isaacson.jpg",
+            "42_das_perfekte_dinner_gordon_ramsay.jpg",
+            "43_es_stephen_king.jpg",
+            "44_dracula_bram_stoker.jpg",
+            "45_me_before_you_jojo_moyes.jpg",
+            "46_ein_ganzes_halbes_jahr_jojo_moyes.jpg",
+            "47_der_da_vinci_code_dan_brown.jpg",
+            "48_mord_im_orientexpress_agatha_christie.jpg",
+            "49_die_saeulen_der_erde_ken_follett.jpg",
+            "50_die_wanderhure_iny_lorentz.jpg",
+            "51_sophies_welt_jostein_gaarder.jpg",
+            "52_eat_pray_love_elizabeth_gilbert.jpg",
+            "53_wild_cheryl_strayed.jpg",
+            "54_21_lektionen_fuer_das_21_jahrhundert_yuval_harari.jpg",
+            "55_the_7_habits_of_highly_effective_people_stephen_covey.jpg"
+        ]
+    },
+    "genre_distribution": {
+        "Fantasy": 8,
+        "Science Fiction": 6,
+        "Klassiker": 5,
+        "Thriller": 4,
+        "Sachbuch": 4,
+        "Humor": 3,
+        "Biografie": 3,
+        "Ratgeber": 3,
+        "Horror": 2,
+        "Romance": 2,
+        "Mystery": 2,
+        "Kochbuch": 2,
+        "Historischer Roman": 2,
+        "Dystopie": 2,
+        "Krimi": 1,
+        "Jugendbuch": 1,
+        "Philosophie": 1,
+        "Reise": 2
+    },
+    "search_recommendations": {
+        "für_deutsche_covers": "Suchen Sie nach 'Buchcover' + deutschen Titeln",
+        "für_englische_covers": "Suchen Sie nach 'book cover' + englischen Titeln",
+        "image_size": "Empfohlene Größe: 400x600 Pixel oder ähnliches Buchcover-Format",
+        "quality": "Hochauflösende Bilder für bessere Darstellung"
+    }
+}

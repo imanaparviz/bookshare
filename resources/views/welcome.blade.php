@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>BookShare - Teile deine Bücher</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
@@ -215,6 +216,19 @@
             cursor: pointer;
             transition: color 0.2s ease;
         }
+        
+        /* Replace all book placeholder icons with hearts */
+        svg[viewBox="0 0 20 20"] path[d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"] {
+            display: none;
+        }
+        svg[viewBox="0 0 20 20"]:has(path[d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"])::before {
+            content: "❤️";
+            font-size: 3rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white" x-data="{ showQuickRating: null }">
@@ -267,9 +281,7 @@
         <nav class="absolute top-0 left-0 right-0 z-20 p-6">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <div class="flex items-center space-x-3">
-                    <svg class="w-10 h-10 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
+                    <span class="text-4xl">❤️</span>
                     <span class="text-3xl font-bold text-white">BookShare</span>
                 </div>
                 
@@ -689,6 +701,132 @@
                 @endforeach
             @endif
 
+            <!-- AI Recommendations Section -->
+            @auth
+                @if(isset($aiRecommendations) && $aiRecommendations->count() > 0)
+                <div class="netflix-row">
+                    <h2 class="netflix-title">🤖 OPENAI-EMPFEHLUNGEN FÜR SIE</h2>
+                    <div class="scroll-container">
+                        <button class="scroll-btn scroll-btn-left" onclick="scrollContainer(this, 'left')">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <div class="section-scroll flex gap-4 pb-4" data-scroll-container>
+                        @foreach($aiRecommendations as $recommendation)
+                            <div class="book-card book-card-medium relative flex-shrink-0 bg-gray-800 rounded-xl overflow-hidden shadow-xl cursor-pointer"
+                                 @click="window.location.href='{{ route('books.show', $recommendation['book']) }}'">
+                                
+                                <!-- AI Badge -->
+                                <div class="absolute top-2 left-2 z-10">
+                                    <span class="px-2 py-1 bg-purple-600 text-white text-xs font-bold rounded">🤖 KI</span>
+                                </div>
+                                
+                                <!-- AI Score Badge -->
+                                <div class="floating-rating">
+                                    <span class="text-white font-bold text-sm">{{ round($recommendation['score'], 1) }}</span>
+                                </div>
+                                
+                                <!-- Book Cover -->
+                                <div class="book-cover-medium bg-gray-700 overflow-hidden relative">
+                                    @if($recommendation['book']->image_path)
+                                        @if(str_starts_with($recommendation['book']->image_path, 'images/'))
+                                            <img src="{{ asset($recommendation['book']->image_path) }}" 
+                                                 alt="{{ $recommendation['book']->title }}" 
+                                                 class="w-full h-full object-cover">
+                                        @else
+                                            <img src="{{ asset('storage/' . $recommendation['book']->image_path) }}" 
+                                                 alt="{{ $recommendation['book']->title }}" 
+                                                 class="w-full h-full object-cover">
+                                        @endif
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                            <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+                                    @endif
+                                    
+                                    <!-- Hover Info -->
+                                    <div class="book-hover-info">
+                                        <h3 class="font-bold text-white text-lg mb-1">{{ Str::limit($recommendation['book']->title, 25) }}</h3>
+                                        <p class="text-gray-300 text-sm mb-2">{{ $recommendation['book']->author }}</p>
+                                        <p class="text-purple-300 text-xs mb-2">🤖 {{ $recommendation['reason'] }}</p>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs px-2 py-1 bg-purple-500 text-white rounded font-medium">
+                                                {{ ucfirst($recommendation['book']->status) }}
+                                            </span>
+                                            @if($recommendation['book']->ratings_count > 0)
+                                                <span class="text-gray-400 text-xs">{{ $recommendation['book']->ratings_count }} Reviews</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                        </div>
+                        <button class="scroll-btn scroll-btn-right" onclick="scrollContainer(this, 'right')">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                @endif
+            @endauth
+
+            <!-- Special OpenAI Analysis Section -->
+            @auth
+            <div class="bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900 rounded-2xl p-8 mb-16 border border-purple-500 shadow-2xl">
+                <div class="text-center">
+                    <div class="mb-6">
+                        <h2 class="text-4xl font-bold mb-4 bg-gradient-to-r from-yellow-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                            🤖 OpenAI Vollanalyse
+                        </h2>
+                        <p class="text-xl text-gray-300 mb-6">
+                            Lassen Sie OpenAI GPT-4 Ihre komplette Buchhistorie analysieren und maßgeschneiderte Empfehlungen erstellen
+                        </p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-black/30 p-4 rounded-lg border border-purple-400">
+                            <div class="text-purple-400 text-2xl mb-2">📊</div>
+                            <h3 class="font-bold text-white mb-1">Vollanalyse</h3>
+                            <p class="text-gray-300 text-sm">Bewertungen, eigene Bücher, Ausleihverlauf</p>
+                        </div>
+                        <div class="bg-black/30 p-4 rounded-lg border border-blue-400">
+                            <div class="text-blue-400 text-2xl mb-2">🎯</div>
+                            <h3 class="font-bold text-white mb-1">Intelligente Empfehlungen</h3>
+                            <p class="text-gray-300 text-sm">GPT-4 powered Buchvorschläge</p>
+                        </div>
+                        <div class="bg-black/30 p-4 rounded-lg border border-pink-400">
+                            <div class="text-pink-400 text-2xl mb-2">✨</div>
+                            <h3 class="font-bold text-white mb-1">Personalisiert</h3>
+                            <p class="text-gray-300 text-sm">Basierend auf Ihrem einzigartigen Geschmack</p>
+                        </div>
+                    </div>
+
+                    <button id="aiAnalysisBtn" 
+                            class="px-10 py-5 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold text-xl transition-all duration-300 transform hover:scale-105 shadow-lg border border-purple-400">
+                        <span class="flex items-center justify-center">
+                            <svg class="w-6 h-6 mr-3 animate-spin hidden" id="aiSpinner" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="31.416" stroke-dashoffset="31.416" class="animate-spin"></circle>
+                            </svg>
+                            <span id="aiButtonText">🤖 OpenAI Analyse starten</span>
+                        </span>
+                    </button>
+
+                    <!-- Results Area -->
+                    <div id="aiResults" class="mt-8 hidden">
+                        <h3 class="text-2xl font-bold text-yellow-400 mb-6">🎯 Ihre OpenAI Empfehlungen</h3>
+                        <div id="aiRecommendationsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- AI recommendations will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endauth
+
             <!-- Call to Action -->
             <div class="text-center py-16">
                 <h2 class="text-4xl font-bold mb-6">Teile deine Lieblingsbücher</h2>
@@ -702,8 +840,12 @@
                             Buch hinzufügen
                         </a>
                         <a href="{{ route('books.index') }}" 
-                           class="px-8 py-4 border-2 border-white hover:bg-white hover:text-black rounded-lg font-bold text-lg transition-all">
+                           class="px-8 py-4 border-2 border-white text-white hover:bg-white hover:text-black rounded-lg font-bold text-lg transition-all">
                             Meine Bücher verwalten
+                        </a>
+                        <a href="{{ route('recommendations') }}" 
+                           class="px-8 py-4 border-2 border-purple-500 text-purple-300 hover:bg-purple-500 hover:text-white rounded-lg font-bold text-lg transition-all">
+                            🤖 Mehr KI-Empfehlungen
                         </a>
                     </div>
                 @else
@@ -720,9 +862,7 @@
     <footer class="bg-black py-12">
         <div class="max-w-7xl mx-auto px-6 text-center">
             <div class="flex items-center justify-center mb-6">
-                <svg class="w-8 h-8 text-yellow-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
+                <span class="text-3xl mr-3">❤️</span>
                 <span class="text-2xl font-bold">BookShare</span>
             </div>
             <p class="text-gray-400 mb-4">
@@ -741,6 +881,241 @@
     </footer>
 
     <script>
+        // OpenAI Analysis Function with extensive logging
+        async function performAIAnalysis() {
+            console.log('🚀 [OpenAI] === STARTING AI ANALYSIS ===');
+            console.log('🚀 [OpenAI] Timestamp:', new Date().toISOString());
+            
+            const btn = document.getElementById('aiAnalysisBtn');
+            const spinner = document.getElementById('aiSpinner');
+            const buttonText = document.getElementById('aiButtonText');
+            const resultsArea = document.getElementById('aiResults');
+            const grid = document.getElementById('aiRecommendationsGrid');
+
+            // Show loading state
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            buttonText.textContent = 'OpenAI analysiert...';
+            
+            console.log('🚀 [OpenAI] UI State: Loading activated');
+            console.log('🚀 [OpenAI] Button disabled:', btn.disabled);
+            console.log('🚀 [OpenAI] Spinner visible:', !spinner.classList.contains('hidden'));
+            
+            try {
+                console.log('🚀 [OpenAI] --- PREPARING API REQUEST ---');
+                
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                console.log('🚀 [OpenAI] CSRF token found:', !!csrfToken);
+                console.log('🚀 [OpenAI] CSRF token (first 10 chars):', csrfToken ? csrfToken.substring(0, 10) + '...' : 'MISSING');
+                
+                const requestUrl = '/api/advanced-ai-recommendations';
+                console.log('🚀 [OpenAI] Request URL:', requestUrl);
+                console.log('🚀 [OpenAI] Request method: GET');
+                
+                const headers = {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                };
+                console.log('🚀 [OpenAI] Request headers:', headers);
+
+                console.log('🚀 [OpenAI] --- SENDING REQUEST TO SERVER ---');
+                const startTime = performance.now();
+                
+                const response = await fetch(requestUrl, {
+                    method: 'GET',
+                    headers: headers
+                });
+
+                const requestDuration = performance.now() - startTime;
+                console.log('🚀 [OpenAI] Request completed in:', Math.round(requestDuration), 'ms');
+                console.log('🚀 [OpenAI] Response status:', response.status);
+                console.log('🚀 [OpenAI] Response status text:', response.statusText);
+                console.log('🚀 [OpenAI] Response headers:', Object.fromEntries(response.headers.entries()));
+
+                if (!response.ok) {
+                    console.error('❌ [OpenAI] HTTP Error Details:');
+                    console.error('❌ [OpenAI] Status:', response.status);
+                    console.error('❌ [OpenAI] Status Text:', response.statusText);
+                    console.error('❌ [OpenAI] URL:', response.url);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                console.log('🚀 [OpenAI] --- PARSING RESPONSE ---');
+                const data = await response.json();
+                console.log('🚀 [OpenAI] Raw response data:', data);
+                console.log('🚀 [OpenAI] Response type:', typeof data);
+                console.log('🚀 [OpenAI] Success flag:', data.success);
+                console.log('🚀 [OpenAI] Total recommendations found:', data.total_found);
+                console.log('🚀 [OpenAI] Analysis type:', data.analysis_type);
+                console.log('🚀 [OpenAI] Recommendations array length:', data.recommendations?.length || 0);
+                
+                if (data.recommendations && data.recommendations.length > 0) {
+                    console.log('🚀 [OpenAI] --- ANALYZING INDIVIDUAL RECOMMENDATIONS ---');
+                    data.recommendations.forEach((rec, index) => {
+                        console.log(`🚀 [OpenAI] Recommendation ${index + 1}:`, {
+                            bookTitle: rec.book?.title,
+                            bookAuthor: rec.book?.author,
+                            bookGenre: rec.book?.genre,
+                            score: rec.score,
+                            reason: rec.reason,
+                            source: rec.recommendation_source,
+                            confidence: rec.ai_confidence
+                        });
+                    });
+                }
+                
+                if (data.success && data.recommendations.length > 0) {
+                    console.log('🚀 [OpenAI] --- RENDERING RESULTS ---');
+                    
+                    // Clear previous results
+                    grid.innerHTML = '';
+                    console.log('🚀 [OpenAI] Previous results cleared');
+                    
+                    // Show results
+                    resultsArea.classList.remove('hidden');
+                    console.log('🚀 [OpenAI] Results area made visible');
+                    
+                    // Add recommendations to grid
+                    data.recommendations.forEach((rec, index) => {
+                        console.log(`🚀 [OpenAI] Creating card ${index + 1} for:`, rec.book?.title);
+                        const bookCard = createAIBookCard(rec);
+                        grid.appendChild(bookCard);
+                        console.log(`🚀 [OpenAI] Card ${index + 1} added to grid`);
+                    });
+                    
+                    // Success state
+                    buttonText.textContent = `✅ ${data.total_found} Empfehlungen gefunden!`;
+                    console.log('🚀 [OpenAI] Success message displayed');
+                    
+                    // Scroll to results
+                    setTimeout(() => {
+                        resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        console.log('🚀 [OpenAI] Scrolled to results area');
+                    }, 500);
+                    
+                    console.log('✅ [OpenAI] === AI ANALYSIS COMPLETED SUCCESSFULLY ===');
+                    
+                } else {
+                    console.warn('⚠️ [OpenAI] No recommendations received');
+                    console.warn('⚠️ [OpenAI] Response data:', data);
+                    buttonText.textContent = '😔 Keine Empfehlungen gefunden';
+                }
+                
+            } catch (error) {
+                console.error('❌ [OpenAI] === AI ANALYSIS FAILED ===');
+                console.error('❌ [OpenAI] Error type:', error.constructor.name);
+                console.error('❌ [OpenAI] Error message:', error.message);
+                console.error('❌ [OpenAI] Error stack:', error.stack);
+                console.error('❌ [OpenAI] Full error object:', error);
+                
+                buttonText.textContent = `❌ Fehler: ${error.message}`;
+            } finally {
+                console.log('🚀 [OpenAI] --- CLEANUP PHASE ---');
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    btn.disabled = false;
+                    spinner.classList.add('hidden');
+                    buttonText.textContent = '🤖 Erneut analysieren';
+                    console.log('🚀 [OpenAI] UI reset completed');
+                    console.log('🚀 [OpenAI] === AI ANALYSIS SESSION ENDED ===');
+                }, 3000);
+            }
+        }
+
+        // Create book card for AI recommendations
+        function createAIBookCard(rec) {
+            const card = document.createElement('div');
+            card.className = 'bg-black/40 backdrop-blur-sm border border-purple-400 rounded-xl p-6 hover:border-yellow-400 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/20';
+            
+            const imageUrl = rec.book.image_path 
+                ? (rec.book.image_path.startsWith('images/') 
+                    ? `/${rec.book.image_path}` 
+                    : `/storage/${rec.book.image_path}`)
+                : null;
+            
+            card.innerHTML = `
+                <div class="flex flex-col h-full">
+                    <!-- Book Cover -->
+                    <div class="mb-4">
+                        ${imageUrl 
+                            ? `<img src="${imageUrl}" alt="${rec.book.title}" class="w-full h-48 object-cover rounded-lg shadow-lg">` 
+                            : `<div class="w-full h-48 bg-gray-700 rounded-lg flex items-center justify-center">
+                                 <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                 </svg>
+                               </div>`
+                        }
+                    </div>
+                    
+                    <!-- Book Info -->
+                    <div class="flex-1">
+                        <h4 class="font-bold text-white text-lg mb-2">${rec.book.title}</h4>
+                        <p class="text-gray-300 text-sm mb-3">von ${rec.book.author}</p>
+                        
+                        <!-- AI Info -->
+                        <div class="mb-3">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="px-2 py-1 bg-purple-600 text-white rounded-full text-xs font-bold">
+                                    ${rec.book.genre}
+                                </span>
+                                <span class="text-yellow-400 text-sm font-bold">
+                                    AI Score: ${rec.score}
+                                </span>
+                            </div>
+                            
+                            ${rec.book.ratings_count > 0 
+                                ? `<div class="flex items-center mb-2">
+                                     <span class="text-yellow-500 mr-1">⭐</span>
+                                     <span class="text-sm text-gray-300">
+                                         ${parseFloat(rec.book.ratings_avg_rating).toFixed(1)} (${rec.book.ratings_count} Reviews)
+                                     </span>
+                                   </div>`
+                                : '<div class="text-gray-500 text-xs mb-2">Noch keine Bewertungen</div>'
+                            }
+                        </div>
+                        
+                        <!-- AI Reason -->
+                        <div class="bg-purple-900/50 p-3 rounded-lg mb-4">
+                            <div class="text-purple-300 text-xs font-bold mb-1">🤖 ${rec.recommendation_source}</div>
+                            <p class="text-gray-200 text-sm">${rec.reason}</p>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="space-y-2">
+                            <a href="/books/${rec.book.id}" 
+                               class="block w-full text-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium">
+                                📖 Details ansehen
+                            </a>
+                            ${rec.book.status === 'verfügbar' 
+                                ? `<form method="POST" action="/loans" class="inline w-full">
+                                     <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''}">
+                                     <input type="hidden" name="book_id" value="${rec.book.id}">
+                                     <button type="submit" 
+                                             class="w-full px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all font-medium">
+                                         📚 Ausleihen
+                                     </button>
+                                   </form>`
+                                : '<div class="w-full px-4 py-2 bg-gray-600 text-gray-300 rounded-lg text-center text-sm">Nicht verfügbar</div>'
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Attach event listener
+        document.addEventListener('DOMContentLoaded', function() {
+            const aiBtn = document.getElementById('aiAnalysisBtn');
+            if (aiBtn) {
+                aiBtn.addEventListener('click', performAIAnalysis);
+            }
+        });
+
         // Scroll container function for buttons
         function scrollContainer(button, direction) {
             const container = button.parentNode.querySelector('[data-scroll-container]');
