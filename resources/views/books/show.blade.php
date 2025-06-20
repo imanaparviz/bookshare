@@ -117,15 +117,15 @@
                                     </div>
                                 @endif
 
-                                                <!-- اطلاعات دیباگ (موقتاً قابل مشاهده) -->
-                <div class="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded text-sm">
-                    <strong>اطلاعات دیباگ:</strong><br>
-                    شناسه مالک کتاب: {{ $book->owner_id }}<br>
-                    شناسه کاربر فعلی: {{ auth()->id() ?? 'وارد نشده' }}<br>
-                    وضعیت کتاب: {{ $book->status }}<br>
-                    آیا مالک است: {{ $book->owner_id === auth()->id() ? 'بله' : 'خیر' }}<br>
-                    وضعیت 'verfügbar' است: {{ $book->status === 'verfügbar' ? 'بله' : 'خیر' }}
-                </div>
+                                <!-- DEBUG INFO (temporarily visible) -->
+                                <div class="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded text-sm">
+                                    <strong>Debug Info:</strong><br>
+                                    Book Owner ID: {{ $book->owner_id }}<br>
+                                    Current User ID: {{ auth()->id() ?? 'Not logged in' }}<br>
+                                    Book Status: {{ $book->status }}<br>
+                                    Is Owner: {{ $book->owner_id === auth()->id() ? 'Yes' : 'No' }}<br>
+                                    Status is 'verfügbar': {{ $book->status === 'verfügbar' ? 'Yes' : 'No' }}
+                                </div>
 
                                 <!-- Action Buttons -->
                                 <div class="flex flex-wrap gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">

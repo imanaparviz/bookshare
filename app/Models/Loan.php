@@ -12,6 +12,7 @@ class Loan extends Model
     const STATUS_ANGEFRAGT = 'angefragt';  // درخواست شده
     const STATUS_AKTIV = 'aktiv';  // فعال
     const STATUS_ABGELEHNT = 'abgelehnt';  // رد شده
+    const STATUS_STORNIERT = 'storniert';  // لغو شده (توسط امانت‌گیرنده)
     const STATUS_ZURUECKGEGEBEN = 'zurückgegeben';  // برگردانده شده
     const STATUS_UEBERFAELLIG = 'überfällig';  // معوقه
 
@@ -84,6 +85,7 @@ class Loan extends Model
             self::STATUS_ANGEFRAGT => 'درخواست شده',
             self::STATUS_AKTIV => 'فعال',
             self::STATUS_ABGELEHNT => 'رد شده',
+            self::STATUS_STORNIERT => 'لغو شده',
             self::STATUS_ZURUECKGEGEBEN => 'برگردانده شده',
             self::STATUS_UEBERFAELLIG => 'معوقه',
         ];

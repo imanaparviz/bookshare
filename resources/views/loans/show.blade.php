@@ -26,9 +26,17 @@
                         <!-- Book Cover -->
                         <div class="md:col-span-1">
                             @if($loan->book->image_path)
-                                <img src="{{ asset('storage/' . $loan->book->image_path) }}" 
-                                     alt="Cover von {{ $loan->book->title }}" 
-                                     class="w-full max-w-sm mx-auto rounded-lg shadow-lg">
+                                @if(str_starts_with($loan->book->image_path, 'images/'))
+                                    {{-- Static seeded images --}}
+                                    <img src="{{ asset($loan->book->image_path) }}" 
+                                         alt="Cover von {{ $loan->book->title }}" 
+                                         class="w-full max-w-sm mx-auto rounded-lg shadow-lg">
+                                @else
+                                    {{-- User uploaded images --}}
+                                    <img src="{{ asset('storage/' . $loan->book->image_path) }}" 
+                                         alt="Cover von {{ $loan->book->title }}" 
+                                         class="w-full max-w-sm mx-auto rounded-lg shadow-lg">
+                                @endif
                             @else
                                 <div class="w-full max-w-sm mx-auto h-96 bg-gray-200 dark:bg-gray-600 rounded-lg shadow-lg flex items-center justify-center">
                                     <span class="text-gray-500 dark:text-gray-400 text-lg">Kein Cover verfügbar</span>
@@ -55,6 +63,8 @@
                                         @if($loan->status === 'aktiv') bg-green-100 text-green-800
                                         @elseif($loan->status === 'angefragt') bg-yellow-100 text-yellow-800
                                         @elseif($loan->status === 'abgelehnt') bg-red-100 text-red-800
+                                        @elseif($loan->status === 'storniert') bg-orange-100 text-orange-800
+                                        @elseif($loan->status === 'zurückgegeben') bg-blue-100 text-blue-800
                                         @else bg-gray-100 text-gray-800 @endif">
                                         Status: {{ ucfirst($loan->status) }}
                                     </span>
@@ -153,6 +163,20 @@
                                             <button type="submit" 
                                                     class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                                 Ablehnen
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    @if($loan->borrower_id === auth()->id() && $loan->status === 'angefragt')
+                                        <!-- Borrower cancel action for pending requests -->
+                                        <form method="POST" action="{{ route('loans.update', $loan) }}" class="inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="action" value="cancel">
+                                            <button type="submit" 
+                                                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                                    onclick="return confirm('Möchten Sie Ihren Ausleihantrag wirklich stornieren?')">
+                                                Antrag stornieren
                                             </button>
                                         </form>
                                     @endif

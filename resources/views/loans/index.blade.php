@@ -53,9 +53,17 @@
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
                                                     @if($loan->book->image_path)
-                                                        <img class="h-10 w-8 rounded object-cover mr-3" 
-                                                             src="{{ asset('storage/' . $loan->book->image_path) }}" 
-                                                             alt="{{ $loan->book->title }}">
+                                                        @if(str_starts_with($loan->book->image_path, 'images/'))
+                                                            {{-- Static seeded images --}}
+                                                            <img class="h-10 w-8 rounded object-cover mr-3" 
+                                                                 src="{{ asset($loan->book->image_path) }}" 
+                                                                 alt="{{ $loan->book->title }}">
+                                                        @else
+                                                            {{-- User uploaded images --}}
+                                                            <img class="h-10 w-8 rounded object-cover mr-3" 
+                                                                 src="{{ asset('storage/' . $loan->book->image_path) }}" 
+                                                                 alt="{{ $loan->book->title }}">
+                                                        @endif
                                                     @endif
                                                     <div>
                                                         <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -75,6 +83,8 @@
                                                     @if($loan->status === 'aktiv') bg-green-100 text-green-800
                                                     @elseif($loan->status === 'angefragt') bg-yellow-100 text-yellow-800
                                                     @elseif($loan->status === 'abgelehnt') bg-red-100 text-red-800
+                                                    @elseif($loan->status === 'storniert') bg-orange-100 text-orange-800
+                                                    @elseif($loan->status === 'zurückgegeben') bg-blue-100 text-blue-800
                                                     @else bg-gray-100 text-gray-800 @endif">
                                                     {{ ucfirst($loan->status) }}
                                                 </span>
@@ -90,8 +100,20 @@
                                                 @endif
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                @if($loan->status === 'angefragt')
+                                                    <form method="POST" action="{{ route('loans.update', $loan) }}" class="inline mr-2">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <input type="hidden" name="action" value="cancel">
+                                                        <button type="submit" 
+                                                                class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                                                                onclick="return confirm('Möchten Sie Ihren Ausleihantrag wirklich stornieren?')">
+                                                            Stornieren
+                                                        </button>
+                                                    </form>
+                                                @endif
                                                 @if($loan->status === 'aktiv')
-                                                    <form method="POST" action="{{ route('loans.update', $loan) }}" class="inline">
+                                                    <form method="POST" action="{{ route('loans.update', $loan) }}" class="inline mr-2">
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="action" value="return">
@@ -103,7 +125,7 @@
                                                     </form>
                                                 @endif
                                                 <a href="{{ route('loans.show', $loan) }}" 
-                                                   class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 ml-2">
+                                                   class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
                                                     Details
                                                 </a>
                                             </td>
@@ -151,9 +173,17 @@
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center">
                                                     @if($loan->book->image_path)
-                                                        <img class="h-10 w-8 rounded object-cover mr-3" 
-                                                             src="{{ asset('storage/' . $loan->book->image_path) }}" 
-                                                             alt="{{ $loan->book->title }}">
+                                                        @if(str_starts_with($loan->book->image_path, 'images/'))
+                                                            {{-- Static seeded images --}}
+                                                            <img class="h-10 w-8 rounded object-cover mr-3" 
+                                                                 src="{{ asset($loan->book->image_path) }}" 
+                                                                 alt="{{ $loan->book->title }}">
+                                                        @else
+                                                            {{-- User uploaded images --}}
+                                                            <img class="h-10 w-8 rounded object-cover mr-3" 
+                                                                 src="{{ asset('storage/' . $loan->book->image_path) }}" 
+                                                                 alt="{{ $loan->book->title }}">
+                                                        @endif
                                                     @endif
                                                     <div>
                                                         <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -173,6 +203,8 @@
                                                     @if($loan->status === 'aktiv') bg-green-100 text-green-800
                                                     @elseif($loan->status === 'angefragt') bg-yellow-100 text-yellow-800
                                                     @elseif($loan->status === 'abgelehnt') bg-red-100 text-red-800
+                                                    @elseif($loan->status === 'storniert') bg-orange-100 text-orange-800
+                                                    @elseif($loan->status === 'zurückgegeben') bg-blue-100 text-blue-800
                                                     @else bg-gray-100 text-gray-800 @endif">
                                                     {{ ucfirst($loan->status) }}
                                                 </span>

@@ -63,10 +63,10 @@ class Book extends Model
     public static function getStatusOptions()
     {
         return [
-            self::STATUS_VERFUEGBAR => 'در دسترس',
-            self::STATUS_ANGEFRAGT => 'درخواست شده',
-            self::STATUS_AUSGELIEHEN => 'امانت داده شده',
-            self::STATUS_RESERVIERT => 'رزرو شده',
+            self::STATUS_VERFUEGBAR => 'Verfügbar',
+            self::STATUS_ANGEFRAGT => 'Angefragt',
+            self::STATUS_AUSGELIEHEN => 'Ausgeliehen',
+            self::STATUS_RESERVIERT => 'Reserviert',
         ];
     }
 }

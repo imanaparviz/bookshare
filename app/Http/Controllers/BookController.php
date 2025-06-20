@@ -6,6 +6,7 @@ use App\Models\Book;
 use App\Services\BookCategorizationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class BookController extends Controller
@@ -19,7 +20,7 @@ class BookController extends Controller
      */
     public function index(): View
     {
-        $books = Book::where('owner_id', auth()->id())->latest()->get();
+        $books = Book::where('owner_id', Auth::id())->latest()->get();
         return view('books.index', compact('books'));
     }
 
@@ -53,7 +54,7 @@ class BookController extends Controller
             $data['image_path'] = $request->file('cover')->store('covers', 'public');
         }
 
-        $data['owner_id'] = auth()->id();
+        $data['owner_id'] = Auth::id();
         $data['status'] = 'verfügbar';
 
         $book = Book::create($data);
@@ -72,7 +73,7 @@ class BookController extends Controller
         // موقتاً همه کاربران احراز هویت شده می‌توانند کتاب‌ها را مشاهده کنند (برای دیباگ)
         // TODO: مجدداً فعالسازی سیستم مجوز پس از تست
         // بررسی اینکه آیا کاربر می‌تواند این کتاب را مشاهده کند (مالک یا کتاب در دسترس باشد)
-        // if ($book->owner_id !== auth()->id() && $book->status !== Book::STATUS_VERFUEGBAR) {
+        // if ($book->owner_id !== Auth::id() && $book->status !== Book::STATUS_VERFUEGBAR) {
         //     abort(403, 'شما مجوز مشاهده این کتاب را ندارید. کتاب در حال حاضر در دسترس نیست.');
         // }
 
@@ -88,8 +89,8 @@ class BookController extends Controller
     public function edit(Book $book): View
     {
         // فقط مالک می‌تواند ویرایش کند
-        if ($book->owner_id !== auth()->id()) {
-            abort(403, 'شما فقط می‌توانید کتاب‌های خود را ویرایش کنید.');
+        if ($book->owner_id !== Auth::id()) {
+            abort(403, 'Sie können nur Ihre eigenen Bücher bearbeiten.');
         }
 
         return view('books.edit', compact('book'));
@@ -101,8 +102,8 @@ class BookController extends Controller
     public function update(Request $request, Book $book): RedirectResponse
     {
         // فقط مالک می‌تواند به‌روزرسانی کند
-        if ($book->owner_id !== auth()->id()) {
-            abort(403, 'شما فقط می‌توانید کتاب‌های خود را ویرایش کنید.');
+        if ($book->owner_id !== Auth::id()) {
+            abort(403, 'Sie können nur Ihre eigenen Bücher bearbeiten.');
         }
 
         $data = $request->validate([
@@ -125,7 +126,7 @@ class BookController extends Controller
 
         $book->update($data);
 
-        return redirect()->route('books.show', $book)->with('success', 'کتاب با موفقیت به‌روزرسانی شد!');
+        return redirect()->route('books.show', $book)->with('success', 'Buch wurde erfolgreich aktualisiert!');
     }
 
     /**
@@ -134,12 +135,12 @@ class BookController extends Controller
     public function destroy(Book $book): RedirectResponse
     {
         // فقط مالک می‌تواند حذف کند
-        if ($book->owner_id !== auth()->id()) {
-            abort(403, 'شما فقط می‌توانید کتاب‌های خود را حذف کنید.');
+        if ($book->owner_id !== Auth::id()) {
+            abort(403, 'Sie können nur Ihre eigenen Bücher löschen.');
         }
 
         $book->delete();
 
-        return redirect()->route('books.index')->with('success', 'کتاب با موفقیت حذف شد!');
+        return redirect()->route('books.index')->with('success', 'Buch wurde erfolgreich gelöscht!');
     }
 }
