@@ -28,7 +28,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Redirect to welcome page (Netflix-style homepage) instead of dashboard
+        return redirect()->intended(route('welcome', absolute: false));
     }
 
     /**

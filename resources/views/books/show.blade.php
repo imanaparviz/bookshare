@@ -19,10 +19,18 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <!-- Book Cover -->
                         <div class="md:col-span-1">
-                            @if($book->image_path && file_exists(public_path($book->image_path)))
-                                <img src="{{ asset($book->image_path) }}" 
-                                     alt="Cover von {{ $book->title }}" 
-                                     class="w-full max-w-sm mx-auto rounded-lg shadow-lg">
+                            @if($book->image_path)
+                                @if(str_starts_with($book->image_path, 'images/'))
+                                    {{-- Static seeded images --}}
+                                    <img src="{{ asset($book->image_path) }}" 
+                                         alt="Cover von {{ $book->title }}" 
+                                         class="w-full max-w-sm mx-auto rounded-lg shadow-lg">
+                                @else
+                                    {{-- User uploaded images --}}
+                                    <img src="{{ asset('storage/' . $book->image_path) }}" 
+                                         alt="Cover von {{ $book->title }}" 
+                                         class="w-full max-w-sm mx-auto rounded-lg shadow-lg">
+                                @endif
                             @else
                                 <div class="w-full max-w-sm mx-auto h-96 bg-gray-200 dark:bg-gray-600 rounded-lg shadow-lg flex items-center justify-center">
                                     <span class="text-gray-500 dark:text-gray-400 text-lg">Kein Cover verfügbar</span>
@@ -161,10 +169,18 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             @foreach($recommendations as $recommendation)
                                 <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
-                                    @if($recommendation['image_path'] && file_exists(public_path($recommendation['image_path'])))
-                                        <img src="{{ asset($recommendation['image_path']) }}" 
-                                             alt="Cover von {{ $recommendation['title'] }}" 
-                                             class="w-full h-32 object-cover rounded mb-3">
+                                    @if($recommendation['image_path'])
+                                        @if(str_starts_with($recommendation['image_path'], 'images/'))
+                                            {{-- Static seeded images --}}
+                                            <img src="{{ asset($recommendation['image_path']) }}" 
+                                                 alt="Cover von {{ $recommendation['title'] }}" 
+                                                 class="w-full h-32 object-cover rounded mb-3">
+                                        @else
+                                            {{-- User uploaded images --}}
+                                            <img src="{{ asset('storage/' . $recommendation['image_path']) }}" 
+                                                 alt="Cover von {{ $recommendation['title'] }}" 
+                                                 class="w-full h-32 object-cover rounded mb-3">
+                                        @endif
                                     @else
                                         <div class="w-full h-32 bg-gray-200 dark:bg-gray-600 rounded mb-3 flex items-center justify-center">
                                             <span class="text-gray-500 dark:text-gray-400 text-sm">Kein Cover</span>

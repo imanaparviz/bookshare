@@ -34,10 +34,18 @@
                         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div class="p-6">
                                 <!-- Book Cover -->
-                                @if($book->image_path && file_exists(public_path($book->image_path)))
-                                    <img src="{{ asset($book->image_path) }}" 
-                                         alt="Cover von {{ $book->title }}" 
-                                         class="w-full h-48 object-cover rounded mb-4">
+                                @if($book->image_path)
+                                    @if(str_starts_with($book->image_path, 'images/'))
+                                        {{-- Static seeded images --}}
+                                        <img src="{{ asset($book->image_path) }}" 
+                                             alt="Cover von {{ $book->title }}" 
+                                             class="w-full h-48 object-cover rounded mb-4">
+                                    @else
+                                        {{-- User uploaded images --}}
+                                        <img src="{{ asset('storage/' . $book->image_path) }}" 
+                                             alt="Cover von {{ $book->title }}" 
+                                             class="w-full h-48 object-cover rounded mb-4">
+                                    @endif
                                 @else
                                     <div class="w-full h-48 bg-gray-200 dark:bg-gray-600 rounded mb-4 flex items-center justify-center">
                                         <span class="text-gray-500 dark:text-gray-400">Kein Cover</span>

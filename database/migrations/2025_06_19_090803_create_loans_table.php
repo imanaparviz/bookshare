@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->date('loan_date');
             $table->date('due_date');
             $table->date('return_date')->nullable();
-            $table->enum('status', ['aktiv', 'zurückgegeben', 'überfällig'])->default('aktiv');
+            $table->enum('status', ['aktiv', 'angefragt', 'zurückgegeben', 'überfällig'])->default('aktiv');
             $table->text('notes')->nullable();
             $table->timestamps();
 

@@ -73,9 +73,16 @@
         
         // Random book for hero background
         $heroBook = $books->where('image_path', '!=', null)->random();
-        $heroImageUrl = $heroBook && $heroBook->image_path && file_exists(public_path($heroBook->image_path)) 
-            ? asset($heroBook->image_path) 
-            : null;
+        $heroImageUrl = null;
+        if ($heroBook && $heroBook->image_path) {
+            if (str_starts_with($heroBook->image_path, 'images/')) {
+                // Static seeded images
+                $heroImageUrl = asset($heroBook->image_path);
+            } else {
+                // User uploaded images
+                $heroImageUrl = asset('storage/' . $heroBook->image_path);
+            }
+        }
     @endphp
 
     <!-- Hero Section with Random Book Background -->
@@ -191,8 +198,14 @@
                     @foreach($popularBooks as $book)
                         <div class="book-card flex-shrink-0 w-64 bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
                             <div class="h-80 bg-gray-700 flex items-center justify-center overflow-hidden">
-                                @if($book->image_path && file_exists(public_path($book->image_path)))
-                                    <img src="{{ asset($book->image_path) }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
+                                @if($book->image_path)
+                                    @if(str_starts_with($book->image_path, 'images/'))
+                                        {{-- Static seeded images --}}
+                                        <img src="{{ asset($book->image_path) }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
+                                    @else
+                                        {{-- User uploaded images --}}
+                                        <img src="{{ asset('storage/' . $book->image_path) }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
+                                    @endif
                                 @else
                                     <div class="text-center p-4 bg-gradient-to-br from-indigo-500 to-purple-600 w-full h-full flex items-center justify-center">
                                         <div>
@@ -282,8 +295,14 @@
                         @foreach($booksInGenre->take(8) as $book)
                             <div class="book-card flex-shrink-0 w-64 bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
                                 <div class="h-80 bg-gray-700 flex items-center justify-center overflow-hidden">
-                                    @if($book->image_path && file_exists(public_path($book->image_path)))
-                                        <img src="{{ asset($book->image_path) }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
+                                    @if($book->image_path)
+                                        @if(str_starts_with($book->image_path, 'images/'))
+                                            {{-- Static seeded images --}}
+                                            <img src="{{ asset($book->image_path) }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
+                                        @else
+                                            {{-- User uploaded images --}}
+                                            <img src="{{ asset('storage/' . $book->image_path) }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
+                                        @endif
                                     @else
                                         <div class="text-center p-4 bg-gradient-to-br from-{{ $loop->parent->index % 2 == 0 ? 'blue' : 'purple' }}-500 to-{{ $loop->parent->index % 2 == 0 ? 'indigo' : 'pink' }}-600 w-full h-full flex items-center justify-center">
                                             <div>
