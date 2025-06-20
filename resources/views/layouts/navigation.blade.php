@@ -37,14 +37,14 @@
 
             <!-- User Area -->
             <div class="hidden sm:flex sm:items-center sm:ms-6 space-x-4">
-                <!-- Notifications Bell (placeholder for future) -->
-                <button class="relative p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded-full">
+                <!-- Notifications Bell -->
+                <button class="relative p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded-full transition-colors">
                     <span class="sr-only">Benachrichtigungen anzeigen</span>
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5-5-5 5h5m-5 4v1a3 3 0 01-6 0v-1m6 0a3 3 0 01-6 0m6 0H9m12 0a3 3 0 01-6 0"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5-5-5h5m-5-4v1a3 3 0 01-6 0v-1m6 0a3 3 0 01-6 0m6 0H9m12 0a3 3 0 01-6 0"/>
                     </svg>
                     <!-- Notification dot (if notifications exist) -->
-                    <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white"></span>
+                    <span class="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white animate-pulse"></span>
                 </button>
 
                 <!-- User Profile Dropdown -->
@@ -130,6 +130,13 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                                 </svg>
                                 {{ __('Ausleihen') }}
+                            </x-dropdown-link>
+                            
+                            <x-dropdown-link :href="route('ratings.user')" class="flex items-center">
+                                <svg class="mr-3 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                </svg>
+                                {{ __('Meine Bewertungen') }}
                             </x-dropdown-link>
 
                             <div class="border-t border-gray-100 dark:border-gray-600"></div>
@@ -246,6 +253,13 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                     </svg>
                     {{ __('Ausleihen') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('ratings.user')" class="flex items-center pl-3">
+                    <svg class="mr-3 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                    {{ __('Meine Bewertungen') }}
                 </x-responsive-nav-link>
 
                 <x-responsive-nav-link href="#" class="flex items-center pl-3">

@@ -80,7 +80,23 @@ class BookController extends Controller
         // دریافت پیشنهادات برای این کتاب
         $recommendations = $this->categorizationService->getRecommendations($book);
 
-        return view('books.show', compact('book', 'recommendations'));
+        // دریافت آمار رتبه‌بندی
+        $ratingStats = [
+            'average' => round($book->average_rating, 1),
+            'total' => $book->total_ratings,
+            'user_rating' => $book->getUserRating(Auth::id()),
+        ];
+
+        // دریافت آخرین رتبه‌بندی‌ها
+        $recentRatings = $book
+            ->ratings()
+            ->with('user')
+            ->withReview()
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        return view('books.show', compact('book', 'recommendations', 'ratingStats', 'recentRatings'));
     }
 
     /**

@@ -3,6 +3,7 @@
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RatingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -72,6 +73,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
     Route::patch('/loans/{loan}', [LoanController::class, 'update'])->name('loans.update');
     Route::get('/loans/{loan}', [LoanController::class, 'show'])->name('loans.show');
+
+    // Rating routes
+    Route::post('/books/{book}/ratings', [RatingController::class, 'store'])->name('ratings.store');
+    Route::delete('/books/{book}/ratings', [RatingController::class, 'destroy'])->name('ratings.destroy');
+    Route::get('/books/{book}/ratings', [RatingController::class, 'show'])->name('ratings.show');
+    Route::get('/my-ratings', [RatingController::class, 'userRatings'])->name('ratings.user');
+    Route::get('/books/{book}/rating-stats', [RatingController::class, 'getStats'])->name('ratings.stats');
 });
 
 require __DIR__ . '/auth.php';

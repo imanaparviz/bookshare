@@ -79,4 +79,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Loan::class, 'lender_id');
     }
+
+    /**
+     * دریافت تمام رتبه‌بندی‌های این کاربر
+     */
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
+    }
 }

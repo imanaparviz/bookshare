@@ -5,35 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>BookShare - Teile deine Bücher</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+        .book-card {
+            transition: all 0.3s ease;
+        }
         .book-card:hover {
-            transform: scale(1.05);
-            transition: transform 0.3s ease;
+            transform: scale(1.08);
+            z-index: 10;
         }
         .hero-gradient {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        .category-scroll {
+        .section-scroll {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: #4f46e5 #1f2937;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
-        .category-scroll::-webkit-scrollbar {
-            height: 8px;
-        }
-        .category-scroll::-webkit-scrollbar-track {
-            background: #1f2937;
-            border-radius: 4px;
-        }
-        .category-scroll::-webkit-scrollbar-thumb {
-            background: #4f46e5;
-            border-radius: 4px;
-        }
-        .category-scroll::-webkit-scrollbar-thumb:hover {
-            background: #3730a3;
+        .section-scroll::-webkit-scrollbar {
+            display: none;
         }
         .hero-background {
             background-size: cover;
@@ -44,32 +36,89 @@
         .hero-overlay {
             background: linear-gradient(
                 to right,
-                rgba(0, 0, 0, 0.8) 0%,
-                rgba(0, 0, 0, 0.6) 50%,
+                rgba(0, 0, 0, 0.9) 0%,
+                rgba(0, 0, 0, 0.7) 50%,
                 rgba(0, 0, 0, 0.3) 100%
             );
         }
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+        .rating-stars {
+            display: flex;
+            align-items: center;
         }
-        .line-clamp-3 {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+        .star {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+        .star.filled {
+            color: #fbbf24;
+        }
+        .star.empty {
+            color: #6b7280;
+        }
+        .floating-rating {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .book-hover-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+            padding: 20px 16px 16px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .book-card:hover .book-hover-info {
+            opacity: 1;
+        }
+        .netflix-row {
+            margin-bottom: 3rem;
+        }
+        .netflix-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        .quick-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+        }
+        .quick-rating .star {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            transition: color 0.2s ease;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white">
+<body class="bg-gray-900 text-white" x-data="{ showQuickRating: null }">
     @php
-        $books = \App\Models\Book::with('owner')->get();
+        $books = \App\Models\Book::with(['owner', 'ratings'])
+            ->withAvg('ratings', 'rating')
+            ->withCount('ratings')
+            ->get();
         $categorizedBooks = $books->groupBy('genre');
         $availableBooks = $books->where('status', 'verfügbar');
         $popularBooks = $books->sortByDesc('created_at')->take(8);
         $recentBooks = $books->sortByDesc('created_at')->take(8);
+        
+        // Top rated books (only books with ratings >= 4.0)
+        $topRatedBooks = $books->filter(function($book) {
+            return $book->ratings_count > 0 && $book->ratings_avg_rating >= 4.0;
+        })->sortByDesc('ratings_avg_rating')->take(8);
         
         // Random book for hero background
         $heroBook = $books->where('image_path', '!=', null)->random();
@@ -85,8 +134,8 @@
         }
     @endphp
 
-    <!-- Hero Section with Random Book Background -->
-    <section class="relative min-h-screen flex items-center justify-center hero-background" 
+    <!-- Hero Section -->
+    <section class="relative min-h-screen hero-background" 
              @if($heroImageUrl) style="background-image: url('{{ $heroImageUrl }}')" @endif>
         
         <!-- Overlay -->
@@ -95,35 +144,35 @@
         <!-- Navigation -->
         <nav class="absolute top-0 left-0 right-0 z-20 p-6">
             <div class="max-w-7xl mx-auto flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <svg class="w-8 h-8 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-10 h-10 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    <span class="text-2xl font-bold text-white">BookShare</span>
+                    <span class="text-3xl font-bold text-white">BookShare</span>
                 </div>
                 
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-6">
                     @auth
-                        <a href="{{ route('dashboard') }}" class="text-white hover:text-indigo-300 transition-colors">
+                        <a href="{{ route('dashboard') }}" class="text-white hover:text-yellow-300 transition-colors font-medium">
                             Dashboard
                         </a>
-                        <a href="{{ route('books.index') }}" class="text-white hover:text-indigo-300 transition-colors">
+                        <a href="{{ route('books.index') }}" class="text-white hover:text-yellow-300 transition-colors font-medium">
                             Meine Bücher
                         </a>
-                        <a href="{{ route('loans.index') }}" class="text-white hover:text-indigo-300 transition-colors">
-                            Ausleihen
+                        <a href="{{ route('ratings.user') }}" class="text-white hover:text-yellow-300 transition-colors font-medium">
+                            Meine Bewertungen
                         </a>
                         <form method="POST" action="{{ route('logout') }}" class="inline">
                             @csrf
-                            <button type="submit" class="text-white hover:text-indigo-300 transition-colors">
+                            <button type="submit" class="text-white hover:text-yellow-300 transition-colors font-medium">
                                 Abmelden
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="text-white hover:text-indigo-300 transition-colors">
+                        <a href="{{ route('login') }}" class="text-white hover:text-yellow-300 transition-colors font-medium">
                             Anmelden
                         </a>
-                        <a href="{{ route('register') }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-semibold transition-colors">
+                        <a href="{{ route('register') }}" class="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-black rounded-lg font-bold transition-colors">
                             Registrieren
                         </a>
                     @endauth
@@ -132,114 +181,144 @@
         </nav>
 
         <!-- Hero Content -->
-        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
-            @if($heroBook)
-                <div class="mb-8">
-                    <span class="inline-block px-3 py-1 bg-indigo-600 text-sm rounded-full mb-4">
-                        Heute empfohlen
-                    </span>
-                    <h1 class="text-5xl md:text-7xl font-bold mb-4 text-white">
-                        {{ $heroBook->title }}
-                    </h1>
-                    <p class="text-xl md:text-2xl text-gray-200 mb-6">
-                        von {{ $heroBook->author }}
-                    </p>
-                    <p class="text-lg text-gray-300 mb-8 max-w-2xl mx-auto line-clamp-3">
-                        {{ $heroBook->description }}
-                    </p>
-                </div>
-            @else
-                <h1 class="text-5xl md:text-7xl font-bold mb-6 text-white">
-                    Entdecke neue Welten
-                </h1>
-                <p class="text-xl md:text-2xl text-gray-200 mb-8">
-                    Teile deine Bücher und entdecke neue Geschichten in deiner Community
-                </p>
-            @endif
-            
-            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                @auth
-                    @if($heroBook)
-                        <a href="{{ route('books.show', $heroBook) }}" class="px-8 py-4 bg-white text-gray-900 hover:bg-gray-100 rounded-lg font-semibold text-lg transition-colors">
-                            Jetzt lesen
-                        </a>
-                    @endif
-                    <a href="{{ route('books.index') }}" class="px-8 py-4 border-2 border-white hover:bg-white hover:text-gray-900 rounded-lg font-semibold text-lg transition-colors text-center">
-                        Meine Bücher
-                    </a>
+        <div class="relative z-10 flex items-center min-h-screen">
+            <div class="max-w-4xl mx-auto px-6">
+                @if($heroBook)
+                    <div class="max-w-2xl">
+                        <span class="inline-block px-4 py-2 bg-yellow-500 text-black text-sm font-bold rounded-full mb-6">
+                            ⭐ TOPBEWERTET
+                        </span>
+                        <h1 class="text-4xl md:text-6xl font-bold mb-4 text-white leading-tight">
+                            {{ $heroBook->title }}
+                        </h1>
+                        <p class="text-xl md:text-2xl text-gray-200 mb-4">
+                            von {{ $heroBook->author }}
+                        </p>
+                        
+                        <!-- Hero Rating -->
+                        @if($heroBook->ratings_count > 0)
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="flex items-center gap-2">
+                                    <div class="rating-stars">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <svg class="star {{ $i <= round($heroBook->ratings_avg_rating) ? 'filled' : 'empty' }}" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                        @endfor
+                                    </div>
+                                    <span class="text-2xl font-bold text-yellow-400">{{ number_format($heroBook->ratings_avg_rating, 1) }}</span>
+                                    <span class="text-gray-300">({{ $heroBook->ratings_count }} {{ $heroBook->ratings_count === 1 ? 'Bewertung' : 'Bewertungen' }})</span>
+                                </div>
+                            </div>
+                        @endif
+                        
+                        @if($heroBook->description)
+                            <p class="text-lg text-gray-300 mb-8 leading-relaxed max-w-xl">
+                                {{ Str::limit($heroBook->description, 200) }}
+                            </p>
+                        @endif
+                        
+                        <div class="flex flex-wrap gap-4">
+                            <a href="{{ route('books.show', $heroBook) }}" 
+                               class="px-8 py-4 bg-white text-black hover:bg-gray-100 rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
+                                ▶ Details ansehen
+                            </a>
+                            @auth
+                                @if($heroBook->status === 'verfügbar' && $heroBook->owner_id !== auth()->id())
+                                    <form method="POST" action="{{ route('loans.store') }}" class="inline">
+                                        @csrf
+                                        <input type="hidden" name="book_id" value="{{ $heroBook->id }}">
+                                        <button type="submit" 
+                                                class="px-8 py-4 border-2 border-white hover:bg-white hover:text-black rounded-lg font-bold text-lg transition-all">
+                                            📚 Ausleihen
+                                        </button>
+                                    </form>
+                                @endif
+                            @else
+                                <a href="{{ route('register') }}" 
+                                   class="px-8 py-4 border-2 border-white hover:bg-white hover:text-black rounded-lg font-bold text-lg transition-all">
+                                    Registrieren zum Ausleihen
+                                </a>
+                            @endauth
+                        </div>
+                    </div>
                 @else
-                    <a href="{{ route('register') }}" class="px-8 py-4 bg-white text-gray-900 hover:bg-gray-100 rounded-lg font-semibold text-lg transition-colors">
-                        Jetzt starten
-                    </a>
-                    <a href="{{ route('login') }}" class="px-8 py-4 border-2 border-white hover:bg-white hover:text-gray-900 rounded-lg font-semibold text-lg transition-colors text-center">
-                        Anmelden
-                    </a>
-                @endauth
+                    <div class="text-center">
+                        <h1 class="text-5xl md:text-7xl font-bold mb-6 text-white">
+                            Entdecke neue Welten
+                        </h1>
+                        <p class="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
+                            Teile deine Bücher und entdecke neue Geschichten in deiner Community
+                        </p>
+                        <div class="flex flex-wrap gap-4 justify-center">
+                            @auth
+                                <a href="{{ route('books.index') }}" class="px-8 py-4 bg-yellow-500 text-black hover:bg-yellow-600 rounded-lg font-bold text-lg transition-all">
+                                    Meine Bücher
+                                </a>
+                            @else
+                                <a href="{{ route('register') }}" class="px-8 py-4 bg-yellow-500 text-black hover:bg-yellow-600 rounded-lg font-bold text-lg transition-all">
+                                    Jetzt starten
+                                </a>
+                            @endauth
+                        </div>
+                    </div>
+                @endif
             </div>
-        </div>
-        
-        <!-- Scroll indicator -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60 animate-bounce">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
-            </svg>
         </div>
     </section>
 
-    <!-- Book Categories Section -->
-    <section class="py-16 bg-gray-900">
+    <!-- Netflix-Style Book Sections -->
+    <div class="bg-gray-900 py-16">
         <div class="max-w-7xl mx-auto px-6">
             
-            <!-- Trending Now -->
-            @if($popularBooks->count() > 0)
-            <div class="mb-16">
-                <h2 class="text-3xl font-bold mb-8 text-white">Beliebte Bücher</h2>
-                <div class="category-scroll flex space-x-6 pb-4">
-                    @foreach($popularBooks as $book)
-                        <div class="book-card flex-shrink-0 w-64 bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
-                            <div class="h-80 bg-gray-700 flex items-center justify-center overflow-hidden">
+            <!-- Top Rated Books -->
+            @if($topRatedBooks->count() > 0)
+            <div class="netflix-row">
+                <h2 class="netflix-title">🏆 Bestbewertet</h2>
+                <div class="section-scroll flex gap-4 pb-4">
+                    @foreach($topRatedBooks as $book)
+                        <div class="book-card relative flex-shrink-0 w-72 bg-gray-800 rounded-xl overflow-hidden shadow-xl cursor-pointer"
+                             @click="window.location.href='{{ route('books.show', $book) }}'">
+                            
+                            <!-- Rating Badge -->
+                            <div class="floating-rating">
+                                <svg class="star filled w-4 h-4" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <span class="text-white font-bold text-sm">{{ number_format($book->ratings_avg_rating, 1) }}</span>
+                            </div>
+                            
+                            <!-- Book Cover -->
+                            <div class="h-96 bg-gray-700 overflow-hidden relative">
                                 @if($book->image_path)
                                     @if(str_starts_with($book->image_path, 'images/'))
-                                        {{-- Static seeded images --}}
-                                        <img src="{{ asset($book->image_path) }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
+                                        <img src="{{ asset($book->image_path) }}" 
+                                             alt="{{ $book->title }}" 
+                                             class="w-full h-full object-cover">
                                     @else
-                                        {{-- User uploaded images --}}
-                                        <img src="{{ asset('storage/' . $book->image_path) }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
+                                        <img src="{{ asset('storage/' . $book->image_path) }}" 
+                                             alt="{{ $book->title }}" 
+                                             class="w-full h-full object-cover">
                                     @endif
                                 @else
-                                    <div class="text-center p-4 bg-gradient-to-br from-indigo-500 to-purple-600 w-full h-full flex items-center justify-center">
-                                        <div>
-                                            <h3 class="font-bold text-lg text-white mb-2 line-clamp-2">{{ $book->title }}</h3>
-                                            <p class="text-indigo-200 text-sm">{{ $book->author }}</p>
-                                        </div>
+                                    <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                        <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
                                     </div>
                                 @endif
-                            </div>
-                            <div class="p-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="px-2 py-1 bg-indigo-600 text-xs rounded-full">{{ $book->genre }}</span>
-                                    <span class="text-xs text-gray-400">{{ $book->publication_year }}</span>
+                                
+                                <!-- Hover Info -->
+                                <div class="book-hover-info">
+                                    <h3 class="font-bold text-white text-lg mb-1">{{ Str::limit($book->title, 30) }}</h3>
+                                    <p class="text-gray-300 text-sm mb-2">{{ $book->author }}</p>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs px-3 py-1 bg-yellow-500 text-black rounded-full font-bold">
+                                            {{ ucfirst($book->status) }}
+                                        </span>
+                                        <span class="text-gray-400 text-xs">{{ $book->ratings_count }} Reviews</span>
+                                    </div>
                                 </div>
-                                <p class="text-gray-300 text-sm mb-3 line-clamp-2">{{ Str::limit($book->description, 80) }}</p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs text-gray-500">von {{ $book->owner->name }}</span>
-                                    @if($book->status === 'verfügbar')
-                                        <span class="px-2 py-1 bg-green-600 text-xs rounded-full">Verfügbar</span>
-                                    @elseif($book->status === 'verliehen')
-                                        <span class="px-2 py-1 bg-red-600 text-xs rounded-full">Verliehen</span>
-                                    @else
-                                        <span class="px-2 py-1 bg-yellow-600 text-xs rounded-full">Angefragt</span>
-                                    @endif
-                                </div>
-                                @auth
-                                    <a href="{{ route('books.show', $book) }}" class="mt-3 block w-full bg-indigo-600 hover:bg-indigo-700 text-center py-2 rounded-lg font-medium transition-colors">
-                                        Details ansehen
-                                    </a>
-                                @else
-                                    <a href="{{ route('login') }}" class="mt-3 block w-full bg-gray-700 hover:bg-gray-600 text-center py-2 rounded-lg font-medium transition-colors">
-                                        Anmelden zum Ausleihen
-                                    </a>
-                                @endauth
                             </div>
                         </div>
                     @endforeach
@@ -247,163 +326,209 @@
             </div>
             @endif
 
-            <!-- Categories -->
-            @foreach($categorizedBooks as $genre => $booksInGenre)
-                @if($booksInGenre->count() > 0)
-                <div class="mb-16">
-                    <h2 class="text-3xl font-bold mb-8 text-white">
-                        @switch($genre)
-                            @case('Fantasy')
-                                Fantasy & Abenteuer
-                                @break
-                            @case('Science Fiction')
-                                Science Fiction
-                                @break
-                            @case('Thriller')
-                                Thriller & Spannung
-                                @break
-                            @case('Krimi')
-                                Krimis
-                                @break
-                            @case('Klassiker')
-                                Klassiker
-                                @break
-                            @case('Sachbuch')
-                                Sachbücher
-                                @break
-                            @case('Ratgeber')
-                                Ratgeber
-                                @break
-                            @case('Biografie')
-                                Biografien
-                                @break
-                            @case('Humor')
-                                Humor
-                                @break
-                            @case('Jugendbuch')
-                                Jugendbücher
-                                @break
-                            @case('Kochbuch')
-                                Kochen & Lifestyle
-                                @break
-                            @default
-                                {{ $genre }}
-                        @endswitch
-                    </h2>
-                    
-                    <div class="category-scroll flex space-x-6 pb-4">
-                        @foreach($booksInGenre->take(8) as $book)
-                            <div class="book-card flex-shrink-0 w-64 bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
-                                <div class="h-80 bg-gray-700 flex items-center justify-center overflow-hidden">
-                                    @if($book->image_path)
-                                        @if(str_starts_with($book->image_path, 'images/'))
-                                            {{-- Static seeded images --}}
-                                            <img src="{{ asset($book->image_path) }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
-                                        @else
-                                            {{-- User uploaded images --}}
-                                            <img src="{{ asset('storage/' . $book->image_path) }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
-                                        @endif
-                                    @else
-                                        <div class="text-center p-4 bg-gradient-to-br from-{{ $loop->parent->index % 2 == 0 ? 'blue' : 'purple' }}-500 to-{{ $loop->parent->index % 2 == 0 ? 'indigo' : 'pink' }}-600 w-full h-full flex items-center justify-center">
-                                            <div>
-                                                <h3 class="font-bold text-lg text-white mb-2 line-clamp-2">{{ $book->title }}</h3>
-                                                <p class="text-blue-200 text-sm">{{ $book->author }}</p>
-                                            </div>
-                                        </div>
-                                    @endif
+            <!-- Popular Books -->
+            @if($popularBooks->count() > 0)
+            <div class="netflix-row">
+                <h2 class="netflix-title">🔥 Beliebt</h2>
+                <div class="section-scroll flex gap-4 pb-4">
+                    @foreach($popularBooks as $book)
+                        <div class="book-card relative flex-shrink-0 w-64 bg-gray-800 rounded-xl overflow-hidden shadow-xl cursor-pointer"
+                             @click="window.location.href='{{ route('books.show', $book) }}'">
+                            
+                            <!-- Rating Badge -->
+                            @if($book->ratings_count > 0)
+                                <div class="floating-rating">
+                                    <svg class="star filled w-4 h-4" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <span class="text-white font-bold text-sm">{{ number_format($book->ratings_avg_rating ?: 0, 1) }}</span>
                                 </div>
-                                <div class="p-4">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="px-2 py-1 bg-indigo-600 text-xs rounded-full">{{ $book->genre }}</span>
-                                        <span class="text-xs text-gray-400">{{ $book->publication_year }}</span>
+                            @endif
+                            
+                            <!-- Book Cover -->
+                            <div class="h-80 bg-gray-700 overflow-hidden relative">
+                                @if($book->image_path)
+                                    @if(str_starts_with($book->image_path, 'images/'))
+                                        <img src="{{ asset($book->image_path) }}" 
+                                             alt="{{ $book->title }}" 
+                                             class="w-full h-full object-cover">
+                                    @else
+                                        <img src="{{ asset('storage/' . $book->image_path) }}" 
+                                             alt="{{ $book->title }}" 
+                                             class="w-full h-full object-cover">
+                                    @endif
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                        <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
                                     </div>
-                                    <p class="text-gray-300 text-sm mb-3 line-clamp-2">{{ Str::limit($book->description, 80) }}</p>
+                                @endif
+                                
+                                <!-- Hover Info -->
+                                <div class="book-hover-info">
+                                    <h3 class="font-bold text-white text-lg mb-1">{{ Str::limit($book->title, 25) }}</h3>
+                                    <p class="text-gray-300 text-sm mb-2">{{ $book->author }}</p>
                                     <div class="flex items-center justify-between">
-                                        <span class="text-xs text-gray-500">von {{ $book->owner->name }}</span>
-                                        @if($book->status === 'verfügbar')
-                                            <span class="px-2 py-1 bg-green-600 text-xs rounded-full">Verfügbar</span>
-                                        @elseif($book->status === 'verliehen')
-                                            <span class="px-2 py-1 bg-red-600 text-xs rounded-full">Verliehen</span>
-                                        @else
-                                            <span class="px-2 py-1 bg-yellow-600 text-xs rounded-full">Angefragt</span>
+                                        <span class="text-xs px-2 py-1 bg-green-500 text-white rounded font-medium">
+                                            {{ ucfirst($book->status) }}
+                                        </span>
+                                        @if($book->ratings_count > 0)
+                                            <span class="text-gray-400 text-xs">{{ $book->ratings_count }} Reviews</span>
                                         @endif
                                     </div>
-                                    @auth
-                                        <a href="{{ route('books.show', $book) }}" class="mt-3 block w-full bg-indigo-600 hover:bg-indigo-700 text-center py-2 rounded-lg font-medium transition-colors">
-                                            Details ansehen
-                                        </a>
-                                    @else
-                                        <a href="{{ route('login') }}" class="mt-3 block w-full bg-gray-700 hover:bg-gray-600 text-center py-2 rounded-lg font-medium transition-colors">
-                                            Anmelden zum Ausleihen
-                                        </a>
-                                    @endauth
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
+                    @endforeach
                 </div>
-                @endif
-            @endforeach
+            </div>
+            @endif
+
+            <!-- Recent Books -->
+            @if($recentBooks->count() > 0)
+            <div class="netflix-row">
+                <h2 class="netflix-title">🆕 Neu hinzugefügt</h2>
+                <div class="section-scroll flex gap-4 pb-4">
+                    @foreach($recentBooks as $book)
+                        <div class="book-card relative flex-shrink-0 w-56 bg-gray-800 rounded-xl overflow-hidden shadow-xl cursor-pointer"
+                             @click="window.location.href='{{ route('books.show', $book) }}'">
+                            
+                            <!-- New Badge -->
+                            <div class="absolute top-2 left-2 z-10">
+                                <span class="px-2 py-1 bg-red-600 text-white text-xs font-bold rounded">NEU</span>
+                            </div>
+                            
+                            <!-- Rating Badge -->
+                            @if($book->ratings_count > 0)
+                                <div class="floating-rating">
+                                    <svg class="star filled w-4 h-4" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <span class="text-white font-bold text-sm">{{ number_format($book->ratings_avg_rating ?: 0, 1) }}</span>
+                                </div>
+                            @endif
+                            
+                            <!-- Book Cover -->
+                            <div class="h-72 bg-gray-700 overflow-hidden relative">
+                                @if($book->image_path)
+                                    @if(str_starts_with($book->image_path, 'images/'))
+                                        <img src="{{ asset($book->image_path) }}" 
+                                             alt="{{ $book->title }}" 
+                                             class="w-full h-full object-cover">
+                                    @else
+                                        <img src="{{ asset('storage/' . $book->image_path) }}" 
+                                             alt="{{ $book->title }}" 
+                                             class="w-full h-full object-cover">
+                                    @endif
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                        <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                @endif
+                                
+                                <!-- Hover Info -->
+                                <div class="book-hover-info">
+                                    <h3 class="font-bold text-white mb-1">{{ Str::limit($book->title, 20) }}</h3>
+                                    <p class="text-gray-300 text-sm mb-2">{{ $book->author }}</p>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs text-gray-500">{{ $book->created_at->diffForHumans() }}</span>
+                                        @if($book->ratings_count > 0)
+                                            <span class="text-gray-400 text-xs">{{ $book->ratings_count }} Reviews</span>
+                                        @else
+                                            <span class="text-gray-500 text-xs">Noch keine Bewertung</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
 
             <!-- Call to Action -->
             <div class="text-center py-16">
-                <h2 class="text-4xl font-bold mb-6 text-white">Bereit zum Teilen?</h2>
+                <h2 class="text-4xl font-bold mb-6">Teile deine Lieblingsbücher</h2>
                 <p class="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-                    Werde Teil unserer Buchliebhaber-Community und entdecke neue Welten durch das Teilen von Büchern.
+                    Werde Teil unserer Community und entdecke neue Bücher durch Bewertungen anderer Leser
                 </p>
-                @guest
-                    <a href="{{ route('register') }}" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-semibold text-lg transition-colors inline-block">
-                        Jetzt kostenlos registrieren
+                @auth
+                    <div class="flex flex-wrap gap-4 justify-center">
+                        <a href="{{ route('books.create') }}" 
+                           class="px-8 py-4 bg-yellow-500 text-black hover:bg-yellow-600 rounded-lg font-bold text-lg transition-all">
+                            📚 Buch hinzufügen
+                        </a>
+                        <a href="{{ route('books.index') }}" 
+                           class="px-8 py-4 border-2 border-white hover:bg-white hover:text-black rounded-lg font-bold text-lg transition-all">
+                            Meine Bücher verwalten
+                        </a>
+                    </div>
+                @else
+                    <a href="{{ route('register') }}" 
+                       class="px-8 py-4 bg-yellow-500 text-black hover:bg-yellow-600 rounded-lg font-bold text-lg transition-all">
+                        Kostenlos registrieren
                     </a>
-                @endguest
+                @endauth
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 py-12">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div>
-                    <div class="flex items-center space-x-2 mb-4">
-                        <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <span class="text-xl font-bold text-white">BookShare</span>
-                    </div>
-                    <p class="text-gray-400">
-                        Die Plattform für Buchliebhaber zum Teilen und Entdecken.
-                    </p>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-white mb-4">Community</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-indigo-400">Über uns</a></li>
-                        <li><a href="#" class="hover:text-indigo-400">Blog</a></li>
-                        <li><a href="#" class="hover:text-indigo-400">Hilfe</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-white mb-4">Bücher</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-indigo-400">Alle Kategorien</a></li>
-                        <li><a href="#" class="hover:text-indigo-400">Neue Bücher</a></li>
-                        <li><a href="#" class="hover:text-indigo-400">Beliebte Bücher</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-white mb-4">Kontakt</h3>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-indigo-400">Support</a></li>
-                        <li><a href="#" class="hover:text-indigo-400">Datenschutz</a></li>
-                        <li><a href="#" class="hover:text-indigo-400">Impressum</a></li>
-                    </ul>
-                </div>
+    <footer class="bg-black py-12">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <div class="flex items-center justify-center mb-6">
+                <svg class="w-8 h-8 text-yellow-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span class="text-2xl font-bold">BookShare</span>
             </div>
-            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2025 BookShare. Alle Rechte vorbehalten.</p>
+            <p class="text-gray-400 mb-4">
+                Teile Wissen. Entdecke Geschichten. Baue Gemeinschaft auf.
+            </p>
+            <div class="flex flex-wrap gap-6 justify-center text-sm text-gray-500">
+                <a href="/about" class="hover:text-white transition-colors">Über uns</a>
+                <a href="/privacy" class="hover:text-white transition-colors">Datenschutz</a>
+                <a href="/contact" class="hover:text-white transition-colors">Kontakt</a>
+                <a href="/help" class="hover:text-white transition-colors">Hilfe</a>
             </div>
+            <p class="text-gray-600 text-sm mt-6">
+                © 2025 BookShare. Made with ❤️ for book lovers.
+            </p>
         </div>
     </footer>
+
+    <script>
+        // Smooth scrolling for horizontal sections
+        document.querySelectorAll('.section-scroll').forEach(section => {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            section.addEventListener('mousedown', (e) => {
+                isDown = true;
+                startX = e.pageX - section.offsetLeft;
+                scrollLeft = section.scrollLeft;
+            });
+
+            section.addEventListener('mouseleave', () => {
+                isDown = false;
+            });
+
+            section.addEventListener('mouseup', () => {
+                isDown = false;
+            });
+
+            section.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - section.offsetLeft;
+                const walk = (x - startX) * 2;
+                section.scrollLeft = scrollLeft - walk;
+            });
+        });
+    </script>
 </body>
 </html>

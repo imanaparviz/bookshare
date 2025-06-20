@@ -48,6 +48,11 @@ class Book extends Model
         return $this->hasMany(Loan::class)->where('status', 'aktiv');
     }
 
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
+    }
+
     // دامنه‌ها (Scopes)
     public function scopeAvailable($query)
     {
@@ -68,5 +73,32 @@ class Book extends Model
             self::STATUS_AUSGELIEHEN => 'Ausgeliehen',
             self::STATUS_RESERVIERT => 'Reserviert',
         ];
+    }
+
+    // Rating helper methods
+    public function getAverageRatingAttribute()
+    {
+        return $this->ratings()->avg('rating') ?? 0;
+    }
+
+    public function getTotalRatingsAttribute()
+    {
+        return $this->ratings()->count();
+    }
+
+    public function getRatingStarsAttribute()
+    {
+        $avgRating = round($this->average_rating, 1);
+        return str_repeat('★', (int) $avgRating) . str_repeat('☆', 5 - (int) $avgRating);
+    }
+
+    public function getUserRating($userId)
+    {
+        return $this->ratings()->where('user_id', $userId)->first();
+    }
+
+    public function hasUserRated($userId)
+    {
+        return $this->ratings()->where('user_id', $userId)->exists();
     }
 }
