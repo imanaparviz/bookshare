@@ -42,7 +42,7 @@ class LoanController extends Controller
         $book = Book::findOrFail($request->book_id);
 
         // Check if book is available
-        if ($book->status !== 'verfügbar') {
+        if ($book->status !== Book::STATUS_VERFUEGBAR) {
             return back()->with('error', 'Dieses Buch ist nicht verfügbar.');
         }
 
@@ -58,12 +58,12 @@ class LoanController extends Controller
             'lender_id' => $book->owner_id,
             'loan_date' => Carbon::now(),
             'due_date' => Carbon::now()->addWeeks(2),  // Default 2 weeks
-            'status' => 'angefragt',
+            'status' => Loan::STATUS_ANGEFRAGT,
             'notes' => $request->notes,
         ]);
 
         // Update book status
-        $book->update(['status' => 'angefragt']);
+        $book->update(['status' => Book::STATUS_ANGEFRAGT]);
 
         return back()->with('success', 'Ausleihantrag wurde erfolgreich gesendet!');
     }
@@ -91,30 +91,30 @@ class LoanController extends Controller
         switch ($request->action) {
             case 'approve':
                 $loan->update([
-                    'status' => 'aktiv',
+                    'status' => Loan::STATUS_AKTIV,
                     'loan_date' => Carbon::now(),
                     'notes' => $request->notes,
                 ]);
-                $loan->book->update(['status' => 'ausgeliehen']);
+                $loan->book->update(['status' => Book::STATUS_AUSGELIEHEN]);
                 $message = 'Ausleihantrag wurde genehmigt!';
                 break;
 
             case 'deny':
                 $loan->update([
-                    'status' => 'abgelehnt',
+                    'status' => Loan::STATUS_ABGELEHNT,
                     'notes' => $request->notes,
                 ]);
-                $loan->book->update(['status' => 'verfügbar']);
+                $loan->book->update(['status' => Book::STATUS_VERFUEGBAR]);
                 $message = 'Ausleihantrag wurde abgelehnt!';
                 break;
 
             case 'return':
                 $loan->update([
-                    'status' => 'zurückgegeben',
+                    'status' => Loan::STATUS_ZURUECKGEGEBEN,
                     'return_date' => Carbon::now(),
                     'notes' => $request->notes,
                 ]);
-                $loan->book->update(['status' => 'verfügbar']);
+                $loan->book->update(['status' => Book::STATUS_VERFUEGBAR]);
                 $message = 'Buch wurde erfolgreich zurückgegeben!';
                 break;
         }
