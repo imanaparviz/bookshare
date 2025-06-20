@@ -38,13 +38,13 @@
             <!-- User Area -->
             <div class="hidden sm:flex sm:items-center sm:ms-6 space-x-4">
                 <!-- Notifications Bell -->
-                <button class="relative p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded-full transition-colors">
+                <button class="relative bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 hover:border-yellow-400 dark:hover:border-yellow-400 p-3 rounded-xl shadow-md hover:shadow-lg text-gray-700 dark:text-gray-200 hover:text-yellow-600 dark:hover:text-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-50 transition-all duration-200 transform hover:scale-105">
                     <span class="sr-only">Benachrichtigungen anzeigen</span>
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5-5-5h5m-5-4v1a3 3 0 01-6 0v-1m6 0a3 3 0 01-6 0m6 0H9m12 0a3 3 0 01-6 0"/>
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
                     </svg>
                     <!-- Notification dot (if notifications exist) -->
-                    <span class="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white animate-pulse"></span>
+                    <span class="absolute -top-1 -right-1 block h-4 w-4 rounded-full bg-red-500 border-2 border-white dark:border-gray-800 text-xs text-white font-bold flex items-center justify-center animate-pulse">3</span>
                 </button>
 
                 <!-- User Profile Dropdown -->
