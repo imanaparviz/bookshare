@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Services\BookCategorizationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class BookController extends Controller
 {
+    public function __construct(
+        private BookCategorizationService $categorizationService
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -51,7 +56,10 @@ class BookController extends Controller
         $data['owner_id'] = auth()->id();
         $data['status'] = 'verfügbar';
 
-        Book::create($data);
+        $book = Book::create($data);
+
+        // Auto-categorize the book using AI
+        $this->categorizationService->updateBookCategory($book);
 
         return redirect()->route('books.index')->with('success', 'Buch wurde erfolgreich hinzugefügt!');
     }
@@ -66,7 +74,10 @@ class BookController extends Controller
             abort(403, 'Sie haben keine Berechtigung, dieses Buch zu sehen.');
         }
 
-        return view('books.show', compact('book'));
+        // Get recommendations for this book
+        $recommendations = $this->categorizationService->getRecommendations($book);
+
+        return view('books.show', compact('book', 'recommendations'));
     }
 
     /**
@@ -101,7 +112,7 @@ class BookController extends Controller
             'publication_year' => 'nullable|integer|min:1000|max:' . date('Y'),
             'language' => 'nullable|string|max:255',
             'condition' => 'required|in:sehr gut,gut,befriedigend,akzeptabel',
-            'status' => 'required|in:verfügbar,ausgeliehen,reserviert',
+            'status' => 'required|in:verfügbar,ausgeliehen,reserviert,angefragt',
             'cover' => 'nullable|image|max:2048',
         ]);
 

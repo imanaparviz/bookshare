@@ -57,13 +57,24 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all books owned by this user.
+     */
+    public function books(): HasMany
+    {
+        return $this->hasMany(Book::class, 'owner_id');
+    }
+
+    /**
      * Get loans where this user is the borrower.
      */
-    public function loans(): HasMany
+    public function borrowedLoans(): HasMany
     {
         return $this->hasMany(Loan::class, 'borrower_id');
     }
 
+    /**
+     * Get loans where this user is the lender.
+     */
     public function lentLoans(): HasMany
     {
         return $this->hasMany(Loan::class, 'lender_id');

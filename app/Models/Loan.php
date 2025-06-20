@@ -47,6 +47,11 @@ class Loan extends Model
         return $query->where('status', 'aktiv');
     }
 
+    public function scopePending($query)
+    {
+        return $query->where('status', 'angefragt');
+    }
+
     public function scopeOverdue($query)
     {
         return $query

@@ -34,8 +34,8 @@
                         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div class="p-6">
                                 <!-- Book Cover -->
-                                @if($book->image_path)
-                                    <img src="{{ asset('storage/' . $book->image_path) }}" 
+                                @if($book->image_path && file_exists(public_path($book->image_path)))
+                                    <img src="{{ asset($book->image_path) }}" 
                                          alt="Cover von {{ $book->title }}" 
                                          class="w-full h-48 object-cover rounded mb-4">
                                 @else

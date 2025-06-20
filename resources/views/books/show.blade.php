@@ -19,8 +19,8 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <!-- Book Cover -->
                         <div class="md:col-span-1">
-                            @if($book->image_path)
-                                <img src="{{ asset('storage/' . $book->image_path) }}" 
+                            @if($book->image_path && file_exists(public_path($book->image_path)))
+                                <img src="{{ asset($book->image_path) }}" 
                                      alt="Cover von {{ $book->title }}" 
                                      class="w-full max-w-sm mx-auto rounded-lg shadow-lg">
                             @else
@@ -131,9 +131,13 @@
                                     @else
                                         <!-- Non-owner buttons -->
                                         @if($book->status === 'verfügbar')
-                                            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                                                Ausleihen anfragen
-                                            </button>
+                                            <form method="POST" action="{{ route('loans.store') }}" class="inline">
+                                                @csrf
+                                                <input type="hidden" name="book_id" value="{{ $book->id }}">
+                                                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                                                    Ausleihen anfragen
+                                                </button>
+                                            </form>
                                         @endif
                                     @endif
 
@@ -147,6 +151,44 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Recommendations Section -->
+            @if(!empty($recommendations) && count($recommendations) > 0)
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mt-6">
+                    <div class="p-6 text-gray-900 dark:text-gray-100">
+                        <h3 class="text-lg font-medium mb-4">Ähnliche Bücher, die Ihnen gefallen könnten</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            @foreach($recommendations as $recommendation)
+                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    @if($recommendation['image_path'] && file_exists(public_path($recommendation['image_path'])))
+                                        <img src="{{ asset($recommendation['image_path']) }}" 
+                                             alt="Cover von {{ $recommendation['title'] }}" 
+                                             class="w-full h-32 object-cover rounded mb-3">
+                                    @else
+                                        <div class="w-full h-32 bg-gray-200 dark:bg-gray-600 rounded mb-3 flex items-center justify-center">
+                                            <span class="text-gray-500 dark:text-gray-400 text-sm">Kein Cover</span>
+                                        </div>
+                                    @endif
+                                    
+                                    <h4 class="font-semibold text-sm mb-1">{{ $recommendation['title'] }}</h4>
+                                    <p class="text-gray-600 dark:text-gray-400 text-xs mb-2">{{ $recommendation['author'] }}</p>
+                                    
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                                            {{ ucfirst($recommendation['genre'] ?? 'Allgemein') }}
+                                        </span>
+                                        <a href="{{ route('books.show', $recommendation['id']) }}" 
+                                           class="text-blue-600 hover:text-blue-800 text-xs font-medium">
+                                            Details →
+                                        </a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout> 
