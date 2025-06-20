@@ -79,8 +79,8 @@ class LoanController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        // بررسی اینکه آیا کاربر امانت‌دهنده است
-        if ($loan->lender_id !== Auth::id() && $request->action !== 'return') {
+        // بررسی اینکه آیا کاربر امانت‌دهنده است برای اعمال approve/deny
+        if ($loan->lender_id !== Auth::id() && ($request->action === 'approve' || $request->action === 'deny')) {
             abort(403, 'Sie sind nicht berechtigt, diese Aktion durchzuführen.');
         }
 
