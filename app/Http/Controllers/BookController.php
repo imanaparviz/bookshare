@@ -73,7 +73,7 @@ class BookController extends Controller
         if ($book->owner_id !== auth()->id() && $book->status !== 'verfügbar') {
             abort(403, 'Sie haben keine Berechtigung, dieses Buch zu sehen.');
         }
-
+^°°°^ccc
         // Get recommendations for this book
         $recommendations = $this->categorizationService->getRecommendations($book);
 
