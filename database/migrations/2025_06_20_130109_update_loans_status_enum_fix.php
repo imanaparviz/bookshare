@@ -7,20 +7,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
     /**
-     * Run the migrations.
+     * اجرای مایگریشن‌ها
      */
     public function up(): void
     {
-        // Da SQLite ALTER COLUMN nicht gut unterstützt, verwenden wir einen anderen Ansatz
-        // Wir löschen die Tabelle und erstellen sie neu mit dem korrekten Schema
+        // چون SQLite از ALTER COLUMN به خوبی پشتیبانی نمی‌کند، از روش دیگری استفاده می‌کنیم
+        // جدول را حذف کرده و با شما درست مجدداً ایجاد می‌کنیم
 
-        // Erstelle backup der Daten
+        // ایجاد پشتیبان از داده‌ها
         $loans = DB::table('loans')->get();
 
-        // Lösche die Tabelle
+        // حذف جدول
         Schema::dropIfExists('loans');
 
-        // Erstelle die Tabelle neu mit korrektem Status-Feld
+        // ایجاد مجدد جدول با فیلد status درست
         Schema::create('loans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('book_id')->constrained('books')->onDelete('cascade');
@@ -29,29 +29,29 @@ return new class extends Migration {
             $table->date('loan_date');
             $table->date('due_date');
             $table->date('return_date')->nullable();
-            // Verwende string statt enum für bessere Kompatibilität
+            // استفاده از string به جای enum برای سازگاری بهتر
             $table->string('status', 20)->default('angefragt');
             $table->text('notes')->nullable();
             $table->timestamps();
 
-            // Indexes for better performance
+            // اندکس‌ها برای بهبود عملکرد
             $table->index(['book_id', 'status']);
             $table->index(['borrower_id', 'status']);
             $table->index('due_date');
         });
 
-        // Wiederherstellen der Daten
+        // بازگردانی داده‌ها
         foreach ($loans as $loan) {
             DB::table('loans')->insert((array) $loan);
         }
     }
 
     /**
-     * Reverse the migrations.
+     * بازگشت مایگریشن‌ها
      */
     public function down(): void
     {
-        // Rückgängig: Zurück zum ursprünglichen Enum
+        // بازگشت: برگشت به enum اصلی
         $loans = DB::table('loans')->get();
 
         Schema::dropIfExists('loans');
@@ -68,7 +68,7 @@ return new class extends Migration {
             $table->text('notes')->nullable();
             $table->timestamps();
 
-            // Indexes for better performance
+            // اندکس‌ها برای بهبود عملکرد
             $table->index(['book_id', 'status']);
             $table->index(['borrower_id', 'status']);
             $table->index('due_date');

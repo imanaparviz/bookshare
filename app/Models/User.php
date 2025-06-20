@@ -49,7 +49,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the books owned by the user.
+     * دریافت کتاب‌های متعلق به کاربر
      */
     public function ownedBooks(): HasMany
     {
@@ -57,7 +57,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all books owned by this user.
+     * دریافت همه کتاب‌های متعلق به این کاربر
      */
     public function books(): HasMany
     {
@@ -65,7 +65,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get loans where this user is the borrower.
+     * دریافت امانت‌هایی که این کاربر امانت‌گیرنده است
      */
     public function borrowedLoans(): HasMany
     {
@@ -73,7 +73,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get loans where this user is the lender.
+     * دریافت امانت‌هایی که این کاربر امانت‌دهنده است
      */
     public function lentLoans(): HasMany
     {

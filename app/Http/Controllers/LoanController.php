@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class LoanController extends Controller
 {
     /**
-     * Display a listing of loans for the authenticated user.
+     * نمایش فهرست امانت‌های کاربر احراز هویت شده
      */
     public function index(): View
     {
@@ -30,7 +30,7 @@ class LoanController extends Controller
     }
 
     /**
-     * Store a new loan request.
+     * ذخیره درخواست امانت جدید
      */
     public function store(Request $request): RedirectResponse
     {
@@ -41,35 +41,35 @@ class LoanController extends Controller
 
         $book = Book::findOrFail($request->book_id);
 
-        // Check if book is available
+        // بررسی اینکه آیا کتاب در دسترس است
         if ($book->status !== Book::STATUS_VERFUEGBAR) {
-            return back()->with('error', 'Dieses Buch ist nicht verfügbar.');
+            return back()->with('error', 'این کتاب در دسترس نیست.');
         }
 
-        // Check if user is not the owner
+        // بررسی اینکه آیا کاربر مالک کتاب نیست
         if ($book->owner_id === auth()->id()) {
-            return back()->with('error', 'Sie können Ihr eigenes Buch nicht ausleihen.');
+            return back()->with('error', 'شما نمی‌توانید کتاب خود را امانت بگیرید.');
         }
 
-        // Create loan request
+        // ایجاد درخواست امانت
         Loan::create([
             'book_id' => $book->id,
             'borrower_id' => auth()->id(),
             'lender_id' => $book->owner_id,
             'loan_date' => Carbon::now(),
-            'due_date' => Carbon::now()->addWeeks(2),  // Default 2 weeks
+            'due_date' => Carbon::now()->addWeeks(2),  // پیش‌فرض ۲ هفته
             'status' => Loan::STATUS_ANGEFRAGT,
             'notes' => $request->notes,
         ]);
 
-        // Update book status
+        // به‌روزرسانی وضعیت کتاب
         $book->update(['status' => Book::STATUS_ANGEFRAGT]);
 
-        return back()->with('success', 'Ausleihantrag wurde erfolgreich gesendet!');
+        return back()->with('success', 'درخواست امانت با موفقیت ارسال شد!');
     }
 
     /**
-     * Update the loan status (approve/deny/return).
+     * به‌روزرسانی وضعیت امانت (تایید/رد/برگرداندن)
      */
     public function update(Request $request, Loan $loan): RedirectResponse
     {
@@ -78,14 +78,14 @@ class LoanController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        // Check if user is the lender
+        // بررسی اینکه آیا کاربر امانت‌دهنده است
         if ($loan->lender_id !== auth()->id() && $request->action !== 'return') {
-            abort(403, 'Sie sind nicht berechtigt, diese Aktion durchzuführen.');
+            abort(403, 'شما مجوز انجام این عمل را ندارید.');
         }
 
-        // Check if user is the borrower for return action
+        // بررسی اینکه آیا کاربر امانت‌گیرنده است برای عمل برگرداندن
         if ($request->action === 'return' && $loan->borrower_id !== auth()->id()) {
-            abort(403, 'Sie können nur Ihre eigenen Ausleihen zurückgeben.');
+            abort(403, 'شما فقط می‌توانید امانت‌های خود را برگردانید.');
         }
 
         switch ($request->action) {
@@ -96,7 +96,7 @@ class LoanController extends Controller
                     'notes' => $request->notes,
                 ]);
                 $loan->book->update(['status' => Book::STATUS_AUSGELIEHEN]);
-                $message = 'Ausleihantrag wurde genehmigt!';
+                $message = 'درخواست امانت تایید شد!';
                 break;
 
             case 'deny':
@@ -105,7 +105,7 @@ class LoanController extends Controller
                     'notes' => $request->notes,
                 ]);
                 $loan->book->update(['status' => Book::STATUS_VERFUEGBAR]);
-                $message = 'Ausleihantrag wurde abgelehnt!';
+                $message = 'درخواست امانت رد شد!';
                 break;
 
             case 'return':
@@ -115,7 +115,7 @@ class LoanController extends Controller
                     'notes' => $request->notes,
                 ]);
                 $loan->book->update(['status' => Book::STATUS_VERFUEGBAR]);
-                $message = 'Buch wurde erfolgreich zurückgegeben!';
+                $message = 'کتاب با موفقیت برگردانده شد!';
                 break;
         }
 
@@ -123,13 +123,13 @@ class LoanController extends Controller
     }
 
     /**
-     * Show the loan details.
+     * نمایش جزئیات امانت
      */
     public function show(Loan $loan): View
     {
-        // Check if user is involved in this loan
+        // بررسی اینکه آیا کاربر در این امانت دخیل است
         if ($loan->borrower_id !== auth()->id() && $loan->lender_id !== auth()->id()) {
-            abort(403, 'Sie haben keine Berechtigung, diese Ausleihe zu sehen.');
+            abort(403, 'شما مجوز مشاهده این امانت را ندارید.');
         }
 
         return view('loans.show', compact('loan'));

@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Loan extends Model
 {
-    // Status constants
-    const STATUS_ANGEFRAGT = 'angefragt';
-    const STATUS_AKTIV = 'aktiv';
-    const STATUS_ABGELEHNT = 'abgelehnt';
-    const STATUS_ZURUECKGEGEBEN = 'zurückgegeben';
-    const STATUS_UEBERFAELLIG = 'überfällig';
+    // ثابت‌های وضعیت
+    const STATUS_ANGEFRAGT = 'angefragt';  // درخواست شده
+    const STATUS_AKTIV = 'aktiv';  // فعال
+    const STATUS_ABGELEHNT = 'abgelehnt';  // رد شده
+    const STATUS_ZURUECKGEGEBEN = 'zurückgegeben';  // برگردانده شده
+    const STATUS_UEBERFAELLIG = 'überfällig';  // معوقه
 
     protected $fillable = [
         'book_id',
@@ -32,7 +32,7 @@ class Loan extends Model
         'return_date' => 'date',
     ];
 
-    // Relationships
+    // روابط
     public function book(): BelongsTo
     {
         return $this->belongsTo(Book::class);
@@ -48,7 +48,7 @@ class Loan extends Model
         return $this->belongsTo(User::class, 'lender_id');
     }
 
-    // Scopes
+    // دامنه‌ها (Scopes)
     public function scopeActive($query)
     {
         return $query->where('status', self::STATUS_AKTIV);
@@ -71,21 +71,21 @@ class Loan extends Model
         return $query->where('status', self::STATUS_ZURUECKGEGEBEN);
     }
 
-    // Accessors
+    // دسترسی‌گرها (Accessors)
     public function getIsOverdueAttribute()
     {
         return $this->status === self::STATUS_AKTIV && $this->due_date < Carbon::now();
     }
 
-    // Helper methods
+    // متدهای کمکی
     public static function getStatusOptions()
     {
         return [
-            self::STATUS_ANGEFRAGT => 'Angefragt',
-            self::STATUS_AKTIV => 'Aktiv',
-            self::STATUS_ABGELEHNT => 'Abgelehnt',
-            self::STATUS_ZURUECKGEGEBEN => 'Zurückgegeben',
-            self::STATUS_UEBERFAELLIG => 'Überfällig',
+            self::STATUS_ANGEFRAGT => 'درخواست شده',
+            self::STATUS_AKTIV => 'فعال',
+            self::STATUS_ABGELEHNT => 'رد شده',
+            self::STATUS_ZURUECKGEGEBEN => 'برگردانده شده',
+            self::STATUS_UEBERFAELLIG => 'معوقه',
         ];
     }
 }

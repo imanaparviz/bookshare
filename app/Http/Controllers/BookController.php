@@ -15,7 +15,7 @@ class BookController extends Controller
     ) {}
 
     /**
-     * Display a listing of the resource.
+     * نمایش فهرست کتاب‌های کاربر
      */
     public function index(): View
     {
@@ -24,7 +24,7 @@ class BookController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * نمایش فرم ایجاد کتاب جدید
      */
     public function create(): View
     {
@@ -32,7 +32,7 @@ class BookController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * ذخیره کتاب جدید در دیتابیس
      */
     public function store(Request $request): RedirectResponse
     {
@@ -48,7 +48,7 @@ class BookController extends Controller
             'cover' => 'nullable|image|max:2048',
         ]);
 
-        // Handle cover image upload
+        // آپلود تصویر جلد کتاب
         if ($request->hasFile('cover')) {
             $data['image_path'] = $request->file('cover')->store('covers', 'public');
         }
@@ -58,51 +58,51 @@ class BookController extends Controller
 
         $book = Book::create($data);
 
-        // Auto-categorize the book using AI
+        // دسته‌بندی خودکار کتاب با استفاده از هوش مصنوعی
         $this->categorizationService->updateBookCategory($book);
 
-        return redirect()->route('books.index')->with('success', 'Buch wurde erfolgreich hinzugefügt!');
+        return redirect()->route('books.index')->with('success', 'کتاب با موفقیت اضافه شد!');
     }
 
     /**
-     * Display the specified resource.
+     * نمایش جزئیات کتاب مشخص
      */
     public function show(Book $book): View
     {
-        // Temporarily allow all authenticated users to view any book for debugging
-        // TODO: Re-enable proper authorization after testing
-        // Check if user can view this book (either owner or book is available)
+        // موقتاً همه کاربران احراز هویت شده می‌توانند کتاب‌ها را مشاهده کنند (برای دیباگ)
+        // TODO: مجدداً فعالسازی سیستم مجوز پس از تست
+        // بررسی اینکه آیا کاربر می‌تواند این کتاب را مشاهده کند (مالک یا کتاب در دسترس باشد)
         // if ($book->owner_id !== auth()->id() && $book->status !== Book::STATUS_VERFUEGBAR) {
-        //     abort(403, 'Sie haben keine Berechtigung, dieses Buch zu sehen. Das Buch ist derzeit nicht verfügbar.');
+        //     abort(403, 'شما مجوز مشاهده این کتاب را ندارید. کتاب در حال حاضر در دسترس نیست.');
         // }
 
-        // Get recommendations for this book
+        // دریافت پیشنهادات برای این کتاب
         $recommendations = $this->categorizationService->getRecommendations($book);
 
         return view('books.show', compact('book', 'recommendations'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * نمایش فرم ویرایش کتاب مشخص
      */
     public function edit(Book $book): View
     {
-        // Only owner can edit
+        // فقط مالک می‌تواند ویرایش کند
         if ($book->owner_id !== auth()->id()) {
-            abort(403, 'Sie können nur Ihre eigenen Bücher bearbeiten.');
+            abort(403, 'شما فقط می‌توانید کتاب‌های خود را ویرایش کنید.');
         }
 
         return view('books.edit', compact('book'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * به‌روزرسانی کتاب مشخص در دیتابیس
      */
     public function update(Request $request, Book $book): RedirectResponse
     {
-        // Only owner can update
+        // فقط مالک می‌تواند به‌روزرسانی کند
         if ($book->owner_id !== auth()->id()) {
-            abort(403, 'Sie können nur Ihre eigenen Bücher bearbeiten.');
+            abort(403, 'شما فقط می‌توانید کتاب‌های خود را ویرایش کنید.');
         }
 
         $data = $request->validate([
@@ -118,28 +118,28 @@ class BookController extends Controller
             'cover' => 'nullable|image|max:2048',
         ]);
 
-        // Handle cover image upload
+        // آپلود تصویر جلد کتاب
         if ($request->hasFile('cover')) {
             $data['image_path'] = $request->file('cover')->store('covers', 'public');
         }
 
         $book->update($data);
 
-        return redirect()->route('books.show', $book)->with('success', 'Buch wurde erfolgreich aktualisiert!');
+        return redirect()->route('books.show', $book)->with('success', 'کتاب با موفقیت به‌روزرسانی شد!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * حذف کتاب مشخص از دیتابیس
      */
     public function destroy(Book $book): RedirectResponse
     {
-        // Only owner can delete
+        // فقط مالک می‌تواند حذف کند
         if ($book->owner_id !== auth()->id()) {
-            abort(403, 'Sie können nur Ihre eigenen Bücher löschen.');
+            abort(403, 'شما فقط می‌توانید کتاب‌های خود را حذف کنید.');
         }
 
         $book->delete();
 
-        return redirect()->route('books.index')->with('success', 'Buch wurde erfolgreich gelöscht!');
+        return redirect()->route('books.index')->with('success', 'کتاب با موفقیت حذف شد!');
     }
 }

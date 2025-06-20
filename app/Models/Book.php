@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Book extends Model
 {
-    // Status constants
-    const STATUS_VERFUEGBAR = 'verfügbar';
-    const STATUS_AUSGELIEHEN = 'ausgeliehen';
-    const STATUS_RESERVIERT = 'reserviert';
-    const STATUS_ANGEFRAGT = 'angefragt';  // Neu hinzugefügt für Leihantrag
+    // ثابت‌های وضعیت
+    const STATUS_VERFUEGBAR = 'verfügbar';  // در دسترس
+    const STATUS_AUSGELIEHEN = 'ausgeliehen';  // امانت داده شده
+    const STATUS_RESERVIERT = 'reserviert';  // رزرو شده
+    const STATUS_ANGEFRAGT = 'angefragt';  // درخواست شده (جدید اضافه شده برای درخواست امانت)
 
     protected $fillable = [
         'title',
@@ -32,7 +32,7 @@ class Book extends Model
         'publication_year' => 'integer',
     ];
 
-    // Relationships
+    // روابط
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
@@ -48,7 +48,7 @@ class Book extends Model
         return $this->hasMany(Loan::class)->where('status', 'aktiv');
     }
 
-    // Scopes
+    // دامنه‌ها (Scopes)
     public function scopeAvailable($query)
     {
         return $query->where('status', self::STATUS_VERFUEGBAR);
@@ -59,14 +59,14 @@ class Book extends Model
         return $query->where('genre', $genre);
     }
 
-    // Helper methods
+    // متدهای کمکی
     public static function getStatusOptions()
     {
         return [
-            self::STATUS_VERFUEGBAR => 'Verfügbar',
-            self::STATUS_ANGEFRAGT => 'Angefragt',
-            self::STATUS_AUSGELIEHEN => 'Ausgeliehen',
-            self::STATUS_RESERVIERT => 'Reserviert',
+            self::STATUS_VERFUEGBAR => 'در دسترس',
+            self::STATUS_ANGEFRAGT => 'درخواست شده',
+            self::STATUS_AUSGELIEHEN => 'امانت داده شده',
+            self::STATUS_RESERVIERT => 'رزرو شده',
         ];
     }
 }
