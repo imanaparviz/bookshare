@@ -86,9 +86,9 @@
 
         <!-- Bottom Footer -->
         <div class="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <div class="text-gray-400 text-sm mb-4 md:mb-0">
+       <!--      <div class="text-gray-400 text-sm mb-4 md:mb-0">
                 © 2025 BookShare. Alle Rechte vorbehalten.
-            </div>
+            </div> -->
             <div class="flex items-center space-x-6 text-sm">
                 <a href="{{ route('privacy') }}" class="text-gray-400 hover:text-white transition-colors">Datenschutz</a>
                 <a href="{{ route('imprint') }}" class="text-gray-400 hover:text-white transition-colors">Impressum</a>

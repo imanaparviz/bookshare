@@ -31,20 +31,7 @@
                 box-shadow: -20px 0 60px rgba(0, 0, 0, 0.5);
             }
             
-            .sidebar-trigger {
-                transform: translateX(-50%);
-                transition: all 0.3s ease-in-out;
-                /* Dark trigger matching website */
-                background: rgba(17, 24, 39, 0.9); /* gray-900 */
-                border: 1px solid rgba(75, 85, 99, 0.3); /* gray-600 */
-            }
-            
-            .sidebar-trigger:hover {
-                transform: translateX(-60%);
-                background: rgba(17, 24, 39, 0.95);
-                box-shadow: -8px 0 25px rgba(0, 0, 0, 0.4);
-                border-color: rgba(75, 85, 99, 0.4);
-            }
+
             
             .user-sidebar ul li {
                 transition: all 0.3s ease;
@@ -283,27 +270,21 @@
                     </div>
 
                     <!-- Footer -->
-                    <div class="p-4 border-t border-slate-700/30">
+                   <!--  <div class="p-4 border-t border-slate-700/30">
                         <div class="text-center text-xs text-slate-400">
                             <p>&copy; {{ date('Y') }} BookShare</p>
                             <p class="mt-1">Made with ❤️</p>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 
-            <!-- Sidebar Trigger -->
-            <div class="sidebar-trigger fixed top-1/2 right-0 z-40 bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-l-full shadow-lg cursor-pointer">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-            </div>
+
         </div>
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const sidebar = document.querySelector('.user-sidebar');
-                const trigger = document.querySelector('.sidebar-trigger');
                 const userProfileTrigger = document.querySelector('.sidebar-user-trigger');
                 
                 // Function to show sidebar
@@ -318,18 +299,11 @@
                     if (sidebar) {
                         setTimeout(() => {
                             if (!sidebar.matches(':hover') && 
-                                !trigger?.matches(':hover') && 
                                 !userProfileTrigger?.matches(':hover')) {
                                 sidebar.classList.remove('show');
                             }
                         }, 100);
                     }
-                }
-                
-                // Show sidebar on main trigger hover
-                if (trigger) {
-                    trigger.addEventListener('mouseenter', showSidebar);
-                    trigger.addEventListener('mouseleave', hideSidebar);
                 }
                 
                 // Show sidebar on user profile trigger hover
