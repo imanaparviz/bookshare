@@ -26,8 +26,9 @@
                     <h3 class="text-lg font-medium mb-4">Von mir ausgeliehene Bücher</h3>
                     
                     @if($borrowedBooks->count() > 0)
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <div class="overflow-x-auto -mx-6 sm:mx-0">
+                            <div class="inline-block min-w-full py-2 align-middle">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead class="bg-gray-50 dark:bg-gray-700">
                                     <tr>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -126,13 +127,24 @@
                                                 @endif
                                                 <a href="{{ route('loans.show', $loan) }}" 
                                                    class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
-                                                    Details
+                                                    💬 Details & Chat
                                                 </a>
+                                                @if($loan->message && $loan->status === 'angefragt')
+                                                    <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        📝 Mit Nachricht
+                                                    </span>
+                                                @endif
+                                                @if($loan->lender_response)
+                                                    <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        ✅ Antwort erhalten
+                                                    </span>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
-                            </table>
+                                </table>
+                            </div>
                         </div>
                     @else
                         <p class="text-gray-500 dark:text-gray-400">Sie haben derzeit keine Bücher ausgeliehen.</p>
@@ -146,8 +158,9 @@
                     <h3 class="text-lg font-medium mb-4">Von mir verliehene Bücher</h3>
                     
                     @if($lentBooks->count() > 0)
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <div class="overflow-x-auto -mx-6 sm:mx-0">
+                            <div class="inline-block min-w-full py-2 align-middle">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead class="bg-gray-50 dark:bg-gray-700">
                                     <tr>
                                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -235,13 +248,24 @@
                                                 @endif
                                                 <a href="{{ route('loans.show', $loan) }}" 
                                                    class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 ml-2">
-                                                    Details
+                                                    💬 Details & Chat
                                                 </a>
+                                                @if($loan->message && $loan->status === 'angefragt')
+                                                    <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        📝 Nachricht erhalten
+                                                    </span>
+                                                @endif
+                                                @if($loan->status === 'angefragt' && !$loan->lender_response)
+                                                    <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                                        ⏳ Antwort ausstehend
+                                                    </span>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
-                            </table>
+                                </table>
+                            </div>
                         </div>
                     @else
                         <p class="text-gray-500 dark:text-gray-400">Sie haben derzeit keine Bücher verliehen.</p>

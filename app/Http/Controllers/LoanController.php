@@ -38,6 +38,10 @@ class LoanController extends Controller
         $request->validate([
             'book_id' => 'required|exists:books,id',
             'notes' => 'nullable|string|max:500',
+            'message' => 'nullable|string|max:1000',
+            'contact_info' => 'nullable|string|max:255',
+            'pickup_method' => 'nullable|string|in:pickup,meet,delivery,discuss',
+            'duration' => 'nullable|string',
         ]);
 
         $book = Book::findOrFail($request->book_id);
@@ -52,21 +56,33 @@ class LoanController extends Controller
             return back()->with('error', 'Sie können Ihr eigenes Buch nicht ausleihen.');
         }
 
+        // Handle duration
+        $durationWeeks = 2;  // Default
+        if ($request->duration && $request->duration !== 'custom') {
+            $durationWeeks = (int) $request->duration;
+        } elseif ($request->duration === 'custom') {
+            $durationWeeks = 2;  // Default for custom, user can specify in message
+        }
+
         // ایجاد درخواست امانت
         Loan::create([
             'book_id' => $book->id,
             'borrower_id' => Auth::id(),
             'lender_id' => $book->owner_id,
             'loan_date' => Carbon::now(),
-            'due_date' => Carbon::now()->addWeeks(2),  // پیش‌فرض ۲ هفته
+            'due_date' => Carbon::now()->addWeeks($durationWeeks),
             'status' => Loan::STATUS_ANGEFRAGT,
             'notes' => $request->notes,
+            'message' => $request->message,
+            'contact_info' => $request->contact_info,
+            'pickup_method' => $request->pickup_method,
+            'requested_duration_weeks' => $durationWeeks,
         ]);
 
         // به‌روزرسانی وضعیت کتاب
         $book->update(['status' => Book::STATUS_ANGEFRAGT]);
 
-        return back()->with('success', 'Ausleihantrag wurde erfolgreich gesendet!');
+        return back()->with('success', 'Ihr detaillierter Ausleihantrag wurde erfolgreich gesendet! Der Buchbesitzer wird sich bald bei Ihnen melden.');
     }
 
     /**
@@ -75,8 +91,10 @@ class LoanController extends Controller
     public function update(Request $request, Loan $loan): RedirectResponse
     {
         $request->validate([
-            'action' => 'required|in:approve,deny,return,cancel',
+            'action' => 'required|in:approve,deny,return,cancel,respond',
             'notes' => 'nullable|string|max:500',
+            'lender_response' => 'nullable|string|max:1000',
+            'final_action' => 'nullable|in:approve,deny,respond_only',
         ]);
 
         // بررسی اینکه آیا کاربر امانت‌دهنده است برای اعمال approve/deny
@@ -126,6 +144,37 @@ class LoanController extends Controller
                 ]);
                 $loan->book->update(['status' => Book::STATUS_VERFUEGBAR]);
                 $message = 'Ausleihantrag wurde erfolgreich storniert!';
+                break;
+
+            case 'respond':
+                // Handle lender response with optional final action
+                $updateData = [
+                    'lender_response' => $request->lender_response,
+                    'responded_at' => Carbon::now(),
+                ];
+
+                if ($request->final_action) {
+                    switch ($request->final_action) {
+                        case 'approve':
+                            $updateData['status'] = Loan::STATUS_AKTIV;
+                            $updateData['loan_date'] = Carbon::now();
+                            $loan->book->update(['status' => Book::STATUS_AUSGELIEHEN]);
+                            $message = 'Ausleihantrag wurde genehmigt und Ihre Nachricht wurde gesendet!';
+                            break;
+                        case 'deny':
+                            $updateData['status'] = Loan::STATUS_ABGELEHNT;
+                            $loan->book->update(['status' => Book::STATUS_VERFUEGBAR]);
+                            $message = 'Ausleihantrag wurde abgelehnt und Ihre Nachricht wurde gesendet!';
+                            break;
+                        case 'respond_only':
+                            $message = 'Ihre Nachricht wurde gesendet! Sie können die Anfrage später genehmigen oder ablehnen.';
+                            break;
+                    }
+                } else {
+                    $message = 'Ihre Nachricht wurde gesendet!';
+                }
+
+                $loan->update($updateData);
                 break;
         }
 

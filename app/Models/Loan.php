@@ -25,12 +25,19 @@ class Loan extends Model
         'return_date',
         'status',
         'notes',
+        'message',
+        'contact_info',
+        'pickup_method',
+        'requested_duration_weeks',
+        'lender_response',
+        'responded_at',
     ];
 
     protected $casts = [
         'loan_date' => 'date',
         'due_date' => 'date',
         'return_date' => 'date',
+        'responded_at' => 'datetime',
     ];
 
     // روابط

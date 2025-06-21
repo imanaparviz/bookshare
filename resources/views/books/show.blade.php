@@ -304,13 +304,12 @@
                                     @else
                                         <!-- Non-owner buttons -->
                                         @if($book->status === 'verfügbar')
-                                            <form method="POST" action="{{ route('loans.store') }}" class="inline">
-                                                @csrf
-                                                <input type="hidden" name="book_id" value="{{ $book->id }}">
-                                                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                                                    Ausleihen anfragen
-                                                </button>
-                                            </form>
+                                            <!-- Enhanced Loan Request Button -->
+                                            <button type="button" 
+                                                    onclick="openLoanRequestModal()"
+                                                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors">
+                                                📚 Ausleihen anfragen
+                                            </button>
                                         @else
                                             <span class="inline-block px-4 py-2 bg-gray-200 text-gray-600 rounded">
                                                 Nicht verfügbar zum Ausleihen (Status: {{ $book->status }})
@@ -376,4 +375,189 @@
             @endif
         </div>
     </div>
+
+    <!-- Enhanced Loan Request Modal -->
+    @if($book->status === 'verfügbar' && $book->owner_id !== auth()->id())
+    <style>
+        @media (max-width: 640px) {
+            .modal-content {
+                max-height: calc(100vh - 2rem);
+                overflow-y: auto;
+            }
+            
+            /* Better touch targets for mobile */
+            .modal-content button,
+            .modal-content select,
+            .modal-content input,
+            .modal-content textarea {
+                min-height: 44px;
+            }
+            
+            /* Prevent zoom on input focus on iOS */
+            .modal-content input,
+            .modal-content select,
+            .modal-content textarea {
+                font-size: 16px;
+            }
+        }
+    </style>
+    <div id="loanRequestModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 p-4">
+        <div class="modal-content relative top-4 mx-auto p-4 sm:p-6 border w-full max-w-lg sm:max-w-xl lg:max-w-2xl shadow-lg rounded-md bg-white dark:bg-gray-800 my-8">
+            <div class="mt-3">
+                <!-- Modal Header -->
+                <div class="flex items-start justify-between mb-4">
+                    <h3 class="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100 pr-4 leading-tight">
+                        📚 Ausleihantrag für<br class="sm:hidden"> 
+                        <span class="block sm:inline">"{{ Str::limit($book->title, 30) }}"</span>
+                    </h3>
+                    <button onclick="closeLoanRequestModal()" class="text-gray-400 hover:text-gray-600 flex-shrink-0 p-1">
+                        <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Loan Request Form -->
+                <form method="POST" action="{{ route('loans.store') }}" class="space-y-4">
+                    @csrf
+                    <input type="hidden" name="book_id" value="{{ $book->id }}">
+                    
+                    <!-- Owner Info -->
+                    <div class="bg-gray-50 dark:bg-gray-700 p-3 sm:p-4 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            @if($book->owner->avatar)
+                                <img src="{{ asset('storage/' . $book->owner->avatar) }}" 
+                                     alt="{{ $book->owner->name }}" 
+                                     class="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover flex-shrink-0">
+                            @else
+                                <div class="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
+                                        {{ strtoupper(substr($book->owner->name, 0, 1)) }}
+                                    </span>
+                                </div>
+                            @endif
+                            <div class="min-w-0 flex-1">
+                                <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                                    Anfrage an: {{ $book->owner->name }}
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    Buchbesitzer
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Duration and Pickup Method - Responsive Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Desired Duration -->
+                        <div>
+                            <label for="duration" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                ⏰ Ausleihdauer
+                            </label>
+                            <select name="duration" id="duration" 
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100">
+                                <option value="1">1 Woche</option>
+                                <option value="2" selected>2 Wochen (Standard)</option>
+                                <option value="3">3 Wochen</option>
+                                <option value="4">1 Monat</option>
+                                <option value="custom">Andere</option>
+                            </select>
+                        </div>
+
+                        <!-- Pickup Method -->
+                        <div>
+                            <label for="pickup_method" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                📍 Übergabe
+                            </label>
+                            <select name="pickup_method" id="pickup_method" 
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100">
+                                <option value="pickup">Ich hole ab</option>
+                                <option value="meet">Treffen vereinbaren</option>
+                                <option value="delivery">Lieferung möglich?</option>
+                                <option value="discuss">In Nachricht besprechen</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Personal Message -->
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            💬 Persönliche Nachricht
+                        </label>
+                        <textarea name="message" id="message" rows="3" class="sm:rows-4"
+                                  placeholder="Hallo! Ich würde gerne Ihr Buch ausleihen..."
+                                  class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 resize-none"></textarea>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            💡 Eine persönliche Nachricht erhöht die Erfolgschance!
+                        </p>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div>
+                        <label for="contact_info" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            📞 Kontakt (optional)
+                        </label>
+                        <input type="text" name="contact_info" id="contact_info" 
+                               placeholder="Tel., WhatsApp, etc."
+                               class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100">
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
+                        <button type="submit" 
+                                class="w-full sm:flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors text-sm sm:text-base">
+                            📤 Anfrage senden
+                        </button>
+                        <button type="button" 
+                                onclick="closeLoanRequestModal()"
+                                class="w-full sm:flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition-colors text-sm sm:text-base">
+                            Abbrechen
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <script>
+        function openLoanRequestModal() {
+            document.getElementById('loanRequestModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            // Focus trap for accessibility
+            const modal = document.getElementById('loanRequestModal');
+            const firstInput = modal.querySelector('input, select, textarea');
+            if (firstInput) firstInput.focus();
+        }
+
+        function closeLoanRequestModal() {
+            document.getElementById('loanRequestModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('loanRequestModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLoanRequestModal();
+            }
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !document.getElementById('loanRequestModal').classList.contains('hidden')) {
+                closeLoanRequestModal();
+            }
+        });
+
+        // Auto-resize textarea on mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.getElementById('message');
+            if (textarea) {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = this.scrollHeight + 'px';
+                });
+            }
+        });
+    </script>
 </x-app-layout> 
