@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Conversation;
 use App\Models\Loan;
+use App\Models\Message;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -65,7 +67,7 @@ class LoanController extends Controller
         }
 
         // ایجاد درخواست امانت
-        Loan::create([
+        $loan = Loan::create([
             'book_id' => $book->id,
             'borrower_id' => Auth::id(),
             'lender_id' => $book->owner_id,
@@ -82,6 +84,41 @@ class LoanController extends Controller
         // به‌روزرسانی وضعیت کتاب
         $book->update(['status' => Book::STATUS_ANGEFRAGT]);
 
+        // Erstelle automatisch eine Conversation für diese Ausleihe
+        $conversation = Conversation::findOrCreateForLoan($loan);
+
+        // Sende automatische Nachricht mit Ausleihdetails
+        $messageContent = "📚 Neue Ausleiheanfrage für \"{$book->title}\"!\n\n";
+        $messageContent .= "📅 Gewünschte Dauer: {$durationWeeks} Wochen\n";
+
+        if ($request->pickup_method) {
+            $pickupMethods = [
+                'pickup' => 'Abholung',
+                'meet' => 'Treffen',
+                'delivery' => 'Lieferung',
+                'discuss' => 'Besprechen'
+            ];
+            $messageContent .= '🚚 Abholung: ' . ($pickupMethods[$request->pickup_method] ?? $request->pickup_method) . "\n";
+        }
+
+        if ($request->contact_info) {
+            $messageContent .= "📞 Kontakt: {$request->contact_info}\n";
+        }
+
+        if ($request->message) {
+            $messageContent .= "\n💬 Nachricht:\n{$request->message}";
+        }
+
+        Message::create([
+            'conversation_id' => $conversation->id,
+            'sender_id' => Auth::id(),
+            'content' => $messageContent,
+            'type' => Message::TYPE_LOAN_REQUEST,
+        ]);
+
+        // Aktualisiere die Conversation
+        $conversation->update(['last_message_at' => now()]);
+
         return back()->with('success', 'Ihr detaillierter Ausleihantrag wurde erfolgreich gesendet! Der Buchbesitzer wird sich bald bei Ihnen melden.');
     }
 
@@ -91,7 +128,7 @@ class LoanController extends Controller
     public function update(Request $request, Loan $loan): RedirectResponse
     {
         $request->validate([
-            'action' => 'required|in:approve,deny,return,cancel,respond',
+            'action' => 'required|in:approve,deny,return,cancel,respond,confirm_return',
             'notes' => 'nullable|string|max:500',
             'lender_response' => 'nullable|string|max:1000',
             'final_action' => 'nullable|in:approve,deny,respond_only',
@@ -107,6 +144,11 @@ class LoanController extends Controller
             abort(403, 'Sie können nur Ihre eigenen Ausleihen zurückgeben oder stornieren.');
         }
 
+        // بررسی اینکه آیا کاربر امانت‌دهنده است برای تایید برگشت
+        if ($request->action === 'confirm_return' && $loan->lender_id !== Auth::id()) {
+            abort(403, 'Sie können nur Ihre eigenen verliehenen Bücher als zurückgegeben bestätigen.');
+        }
+
         switch ($request->action) {
             case 'approve':
                 $loan->update([
@@ -116,6 +158,10 @@ class LoanController extends Controller
                 ]);
                 $loan->book->update(['status' => Book::STATUS_AUSGELIEHEN]);
                 $message = 'Ausleihantrag wurde genehmigt!';
+
+                // Sende automatische Nachricht
+                $this->sendLoanStatusMessage($loan, Message::TYPE_LOAN_APPROVED,
+                    '✅ Ihr Ausleihantrag wurde genehmigt! Sie können das Buch nun abholen.');
                 break;
 
             case 'deny':
@@ -125,6 +171,10 @@ class LoanController extends Controller
                 ]);
                 $loan->book->update(['status' => Book::STATUS_VERFUEGBAR]);
                 $message = 'Ausleihantrag wurde abgelehnt!';
+
+                // Sende automatische Nachricht
+                $this->sendLoanStatusMessage($loan, Message::TYPE_LOAN_DENIED,
+                    '❌ Ihr Ausleihantrag wurde leider abgelehnt.');
                 break;
 
             case 'return':
@@ -135,6 +185,10 @@ class LoanController extends Controller
                 ]);
                 $loan->book->update(['status' => Book::STATUS_VERFUEGBAR]);
                 $message = 'Buch wurde erfolgreich zurückgegeben!';
+
+                // Sende automatische Nachricht
+                $this->sendLoanStatusMessage($loan, Message::TYPE_BOOK_RETURNED,
+                    '📚 Das Buch wurde erfolgreich zurückgegeben. Danke für die Ausleihe!');
                 break;
 
             case 'cancel':
@@ -144,6 +198,24 @@ class LoanController extends Controller
                 ]);
                 $loan->book->update(['status' => Book::STATUS_VERFUEGBAR]);
                 $message = 'Ausleihantrag wurde erfolgreich storniert!';
+
+                // Sende automatische Nachricht
+                $this->sendLoanStatusMessage($loan, Message::TYPE_SYSTEM,
+                    '🚫 Der Ausleihantrag wurde storniert.');
+                break;
+
+            case 'confirm_return':
+                $loan->update([
+                    'status' => Loan::STATUS_ZURUECKGEGEBEN,
+                    'return_date' => Carbon::now(),
+                    'notes' => $request->notes,
+                ]);
+                $loan->book->update(['status' => Book::STATUS_VERFUEGBAR]);
+                $message = 'Buch-Rückgabe wurde bestätigt! Das Buch ist jetzt wieder verfügbar.';
+
+                // Sende automatische Nachricht
+                $this->sendLoanStatusMessage($loan, Message::TYPE_BOOK_RETURNED,
+                    '✅ Der Buchbesitzer hat die Rückgabe bestätigt. Das Buch ist wieder verfügbar!');
                 break;
 
             case 'respond':
@@ -160,18 +232,30 @@ class LoanController extends Controller
                             $updateData['loan_date'] = Carbon::now();
                             $loan->book->update(['status' => Book::STATUS_AUSGELIEHEN]);
                             $message = 'Ausleihantrag wurde genehmigt und Ihre Nachricht wurde gesendet!';
+
+                            // Sende Nachricht mit Genehmigung
+                            $this->sendLoanResponseMessage($loan, $request->lender_response, Message::TYPE_LOAN_APPROVED);
                             break;
                         case 'deny':
                             $updateData['status'] = Loan::STATUS_ABGELEHNT;
                             $loan->book->update(['status' => Book::STATUS_VERFUEGBAR]);
                             $message = 'Ausleihantrag wurde abgelehnt und Ihre Nachricht wurde gesendet!';
+
+                            // Sende Nachricht mit Ablehnung
+                            $this->sendLoanResponseMessage($loan, $request->lender_response, Message::TYPE_LOAN_DENIED);
                             break;
                         case 'respond_only':
                             $message = 'Ihre Nachricht wurde gesendet! Sie können die Anfrage später genehmigen oder ablehnen.';
+
+                            // Sende nur die Nachricht ohne Statusänderung
+                            $this->sendLoanResponseMessage($loan, $request->lender_response, Message::TYPE_TEXT);
                             break;
                     }
                 } else {
                     $message = 'Ihre Nachricht wurde gesendet!';
+
+                    // Sende nur die Nachricht
+                    $this->sendLoanResponseMessage($loan, $request->lender_response, Message::TYPE_TEXT);
                 }
 
                 $loan->update($updateData);
@@ -192,5 +276,54 @@ class LoanController extends Controller
         }
 
         return view('loans.show', compact('loan'));
+    }
+
+    /**
+     * Sendet eine Nachricht mit Statusänderung für eine Ausleihe.
+     */
+    private function sendLoanStatusMessage(Loan $loan, string $type, string $content)
+    {
+        $conversation = $loan->conversation;
+        if (!$conversation) {
+            return;  // No conversation found, cannot send message
+        }
+
+        $messageContent = $content;
+        if ($loan->status === Loan::STATUS_AKTIV) {
+            $messageContent .= "\n\n📅 Fälligkeitsdatum: " . Carbon::parse($loan->due_date)->format('d.m.Y');
+        }
+
+        Message::create([
+            'conversation_id' => $conversation->id,
+            'sender_id' => $loan->lender_id,  // Sender is the lender
+            'content' => $messageContent,
+            'type' => $type,
+        ]);
+        $conversation->update(['last_message_at' => now()]);
+    }
+
+    /**
+     * Sendet eine Nachricht mit Antwort des Leihers auf eine Ausleihe.
+     */
+    private function sendLoanResponseMessage(Loan $loan, string $lenderResponse, int $type)
+    {
+        $conversation = $loan->conversation;
+        if (!$conversation) {
+            return;  // No conversation found, cannot send message
+        }
+
+        $messageContent = "💬 Antwort des Leihers:\n";
+        $messageContent .= "📝 Nachricht: {$lenderResponse}\n";
+        if ($loan->status === Loan::STATUS_AKTIV) {
+            $messageContent .= "\n📅 Fälligkeitsdatum: " . Carbon::parse($loan->due_date)->format('d.m.Y');
+        }
+
+        Message::create([
+            'conversation_id' => $conversation->id,
+            'sender_id' => $loan->lender_id,  // Sender is the lender
+            'content' => $messageContent,
+            'type' => $type,
+        ]);
+        $conversation->update(['last_message_at' => now()]);
     }
 }

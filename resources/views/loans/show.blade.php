@@ -240,6 +240,56 @@
                                     @endif
                                 </div>
 
+                                <!-- Chat-Button Section -->
+                                <div class="border-t border-gray-200 dark:border-gray-700 pt-4 sm:pt-6">
+                                    <div class="flex justify-center">
+                                        @if($loan->conversation)
+                                            <a href="{{ route('conversations.show', $loan->conversation) }}" 
+                                               class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-md">
+                                                💬 Chat öffnen
+                                                @if($loan->conversation->getUnreadCount(auth()->user()) > 0)
+                                                    <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                                                        {{ $loan->conversation->getUnreadCount(auth()->user()) }}
+                                                    </span>
+                                                @endif
+                                            </a>
+                                        @else
+                                            <form method="POST" action="{{ route('conversations.create-for-loan', $loan) }}">
+                                                @csrf
+                                                <button type="submit" 
+                                                        class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors shadow-md">
+                                                    💬 Chat starten
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                    
+                                    <!-- Online-Status der Gesprächspartner -->
+                                    <div class="mt-3 flex justify-center space-x-6 text-sm text-gray-600 dark:text-gray-400">
+                                        @if($loan->lender_id !== auth()->id())
+                                            <div class="flex items-center space-x-2">
+                                                <span>{{ $loan->lender->name }}:</span>
+                                                @if($loan->lender->isOnline())
+                                                    <span class="text-green-600 dark:text-green-400">🟢 Online</span>
+                                                @else
+                                                    <span class="text-gray-500">{{ $loan->lender->online_status }}</span>
+                                                @endif
+                                            </div>
+                                        @endif
+                                        
+                                        @if($loan->borrower_id !== auth()->id())
+                                            <div class="flex items-center space-x-2">
+                                                <span>{{ $loan->borrower->name }}:</span>
+                                                @if($loan->borrower->isOnline())
+                                                    <span class="text-green-600 dark:text-green-400">🟢 Online</span>
+                                                @else
+                                                    <span class="text-gray-500">{{ $loan->borrower->online_status }}</span>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
                                 <!-- Notes -->
                                 @if($loan->notes)
                                     <div class="border-t border-gray-200 dark:border-gray-700 pt-4 sm:pt-6">
@@ -300,7 +350,21 @@
                                             <button type="submit" 
                                                     class="w-full sm:w-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm sm:text-base min-h-[44px]"
                                                     onclick="return confirm('Möchten Sie dieses Buch wirklich zurückgeben?')">
-                                                Buch zurückgeben
+                                                📚 Buch zurückgeben
+                                            </button>
+                                        </form>
+                                    @endif
+
+                                    @if($loan->lender_id === auth()->id() && $loan->status === 'aktiv')
+                                        <!-- Lender confirm return action -->
+                                        <form method="POST" action="{{ route('loans.update', $loan) }}" class="w-full sm:w-auto">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="action" value="confirm_return">
+                                            <button type="submit" 
+                                                    class="w-full sm:w-auto bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm sm:text-base min-h-[44px]"
+                                                    onclick="return confirm('Wurde das Buch wirklich zurückgegeben? Es wird dann automatisch wieder verfügbar.')">
+                                                ✅ Rückgabe bestätigen
                                             </button>
                                         </form>
                                     @endif

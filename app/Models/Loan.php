@@ -56,6 +56,11 @@ class Loan extends Model
         return $this->belongsTo(User::class, 'lender_id');
     }
 
+    public function conversation(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Conversation::class);
+    }
+
     // دامنه‌ها (Scopes)
     public function scopeActive($query)
     {

@@ -72,21 +72,35 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Books resource routes
+    // Books routes
     Route::resource('books', BookController::class);
 
     // Loans routes
-    Route::get('/loans', [LoanController::class, 'index'])->name('loans.index');
-    Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
-    Route::patch('/loans/{loan}', [LoanController::class, 'update'])->name('loans.update');
-    Route::get('/loans/{loan}', [LoanController::class, 'show'])->name('loans.show');
+    Route::resource('loans', LoanController::class)->except(['create', 'edit']);
 
-    // Rating routes
-    Route::post('/books/{book}/ratings', [RatingController::class, 'store'])->name('ratings.store');
+    // Messaging routes
+    Route::prefix('conversations')->name('conversations.')->group(function () {
+        Route::get('/', [App\Http\Controllers\ConversationController::class, 'index'])->name('index');
+        Route::get('/{conversation}', [App\Http\Controllers\ConversationController::class, 'show'])->name('show');
+        Route::post('/{conversation}/send', [App\Http\Controllers\ConversationController::class, 'sendMessage'])->name('send');
+        Route::post('/{conversation}/quick', [App\Http\Controllers\ConversationController::class, 'sendQuickMessage'])->name('quick');
+        Route::patch('/{conversation}/read', [App\Http\Controllers\ConversationController::class, 'markAllAsRead'])->name('read');
+        Route::patch('/{conversation}/archive', [App\Http\Controllers\ConversationController::class, 'archive'])->name('archive');
+        Route::get('/loan/{loan}', [App\Http\Controllers\ConversationController::class, 'showForLoan'])->name('loan');
+        Route::post('/loan/{loan}/create', [App\Http\Controllers\ConversationController::class, 'createForLoan'])->name('create-for-loan');
+    });
+
+    // API routes for AJAX calls
+    Route::prefix('api')->name('api.')->group(function () {
+        Route::get('/unread-count', [App\Http\Controllers\ConversationController::class, 'getUnreadCount'])->name('unread-count');
+    });
+
+    // Ratings routes
+    Route::get('/ratings', [RatingController::class, 'index'])->name('ratings.index');
+    Route::get('/ratings/user/{user}', [RatingController::class, 'userRatings'])->name('ratings.user');
+    Route::post('/books/{book}/rate', [RatingController::class, 'store'])->name('ratings.store');
     Route::delete('/books/{book}/ratings', [RatingController::class, 'destroy'])->name('ratings.destroy');
     Route::get('/books/{book}/ratings', [RatingController::class, 'show'])->name('ratings.show');
-    Route::get('/my-ratings', [RatingController::class, 'userRatings'])->name('ratings.user');
-    Route::get('/books/{book}/rating-stats', [RatingController::class, 'getStats'])->name('ratings.stats');
 
     // AI Recommendation routes
     Route::get('/recommendations', [WelcomeController::class, 'recommendations'])->name('recommendations');

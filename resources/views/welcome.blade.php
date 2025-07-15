@@ -356,8 +356,9 @@
             $popularBooks = $books->sortByDesc('created_at')->take(8);
         }
         
-        // Random book for hero background
-        $heroBook = $books->where('image_path', '!=', null)->random();
+        // Random verfügbares book for hero background (nur verfügbare Bücher zeigen)
+        $availableBooksWithImages = $books->where('image_path', '!=', null)->where('status', 'verfügbar');
+        $heroBook = $availableBooksWithImages->isNotEmpty() ? $availableBooksWithImages->random() : null;
         $heroImageUrl = null;
         if ($heroBook && $heroBook->image_path) {
             if (str_starts_with($heroBook->image_path, 'images/')) {
@@ -385,7 +386,7 @@
                     <span class="text-3xl font-bold text-white">BookShare</span>
                 </div>
                 
-                <div class="flex items-center space-x-6">
+                <div class="hidden md:flex items-center space-x-6">
                     @auth
                         <a href="{{ route('dashboard') }}" class="text-white hover:text-yellow-300 transition-colors font-medium">
                             Dashboard
@@ -393,7 +394,7 @@
                         <a href="{{ route('books.index') }}" class="text-white hover:text-yellow-300 transition-colors font-medium">
                             Meine Bücher
                         </a>
-                        <a href="{{ route('ratings.user') }}" class="text-white hover:text-yellow-300 transition-colors font-medium">
+                        <a href="{{ route('ratings.user', auth()->user()) }}" class="text-white hover:text-yellow-300 transition-colors font-medium">
                             Meine Bewertungen
                         </a>
                         <form method="POST" action="{{ route('logout') }}" class="inline">
@@ -422,10 +423,10 @@
                         <span class="inline-block px-4 py-2 bg-yellow-500 text-black text-sm font-bold rounded-full mb-6">
                             TOPBEWERTET
                         </span>
-                        <h1 class="text-4xl md:text-6xl font-bold mb-4 text-white leading-tight">
+                        <h1 class="text-4xl md:text-6xl font-bold mb-4 text-white leading-tight hero-book-title">
                             {{ $heroBook->title }}
                         </h1>
-                        <p class="text-xl md:text-2xl text-gray-200 mb-4">
+                        <p class="text-xl md:text-2xl text-gray-200 mb-4 hero-book-author">
                             von {{ $heroBook->author }}
                         </p>
                         
@@ -447,7 +448,7 @@
                         @endif
                         
                         @if($heroBook->description)
-                            <p class="text-lg text-gray-300 mb-8 leading-relaxed max-w-xl">
+                            <p class="text-lg text-gray-300 mb-8 leading-relaxed max-w-xl hero-book-description">
                                 {{ Str::limit($heroBook->description, 200) }}
                             </p>
                         @endif
@@ -459,18 +460,14 @@
                             </a>
                             @auth
                                 @if($heroBook->status === 'verfügbar' && $heroBook->owner_id !== auth()->id())
-                                    <form method="POST" action="{{ route('loans.store') }}" class="inline">
-                                        @csrf
-                                        <input type="hidden" name="book_id" value="{{ $heroBook->id }}">
-                                        <button type="submit" 
-                                                class="px-8 py-4 border-2 border-white text-white hover:bg-white hover:text-black rounded-lg font-bold text-lg transition-all">
-                                            Ausleihen
-                                        </button>
-                                    </form>
+                                    <a href="{{ route('books.show', $heroBook) }}" 
+                                       class="px-8 py-4 border-2 border-white text-white hover:bg-white hover:text-black rounded-lg font-bold text-lg transition-all hero-loan-link">
+                                        Ausleihen
+                                    </a>
                                 @endif
                             @else
                                 <a href="{{ route('register') }}" 
-                                   class="px-8 py-4 border-2 border-white text-white hover:bg-white hover:text-black rounded-lg font-bold text-lg transition-all">
+                                   class="px-8 py-4 border-2 border-white text-white hover:bg-white hover:text-black rounded-lg font-bold text-lg transition-all hero-register-link">
                                     Registrieren zum Ausleihen
                                 </a>
                             @endauth
@@ -517,8 +514,8 @@
                     </button>
                     <div class="section-scroll flex gap-4 pb-4" data-scroll-container>
                     @foreach($topRatedBooks as $book)
-                        <div class="book-card book-card-large relative flex-shrink-0 bg-gray-800 rounded-xl overflow-hidden shadow-xl cursor-pointer"
-                             @click="window.location.href='{{ route('books.show', $book) }}'">
+                        <a href="{{ route('books.show', $book) }}" class="block">
+                            <div class="book-card book-card-large relative flex-shrink-0 bg-gray-800 rounded-xl overflow-hidden shadow-xl cursor-pointer hover:scale-105 transition-transform duration-300">
                             
                             <!-- Rating Badge -->
                             <div class="floating-rating">
@@ -561,6 +558,7 @@
                                 </div>
                             </div>
                         </div>
+                        </a>
                     @endforeach
                     </div>
                     <button class="scroll-btn scroll-btn-right" onclick="scrollContainer(this, 'right')">
@@ -584,8 +582,8 @@
                     </button>
                     <div class="section-scroll flex gap-4 pb-4" data-scroll-container>
                     @foreach($popularBooks as $book)
-                        <div class="book-card book-card-medium relative flex-shrink-0 bg-gray-800 rounded-xl overflow-hidden shadow-xl cursor-pointer"
-                             @click="window.location.href='{{ route('books.show', $book) }}'">
+                        <a href="{{ route('books.show', $book) }}" class="block">
+                            <div class="book-card book-card-medium relative flex-shrink-0 bg-gray-800 rounded-xl overflow-hidden shadow-xl cursor-pointer hover:scale-105 transition-transform duration-300">
                             
                             <!-- Rating Badge -->
                             @if($book->ratings_count > 0)
@@ -632,6 +630,7 @@
                                 </div>
                             </div>
                         </div>
+                        </a>
                     @endforeach
                     </div>
                     <button class="scroll-btn scroll-btn-right" onclick="scrollContainer(this, 'right')">
@@ -655,8 +654,8 @@
                     </button>
                     <div class="section-scroll flex gap-4 pb-4" data-scroll-container>
                     @foreach($recentBooks as $book)
-                        <div class="book-card book-card-small relative flex-shrink-0 bg-gray-800 rounded-xl overflow-hidden shadow-xl cursor-pointer"
-                             @click="window.location.href='{{ route('books.show', $book) }}'">
+                        <a href="{{ route('books.show', $book) }}" class="block">
+                            <div class="book-card book-card-small relative flex-shrink-0 bg-gray-800 rounded-xl overflow-hidden shadow-xl cursor-pointer hover:scale-105 transition-transform duration-300">
                             
                             <!-- New Badge -->
                             <div class="absolute top-2 left-2 z-10">
@@ -708,6 +707,7 @@
                                 </div>
                             </div>
                         </div>
+                        </a>
                     @endforeach
                     </div>
                     <button class="scroll-btn scroll-btn-right" onclick="scrollContainer(this, 'right')">
@@ -733,8 +733,8 @@
                             </button>
                             <div class="section-scroll flex gap-4 pb-4" data-scroll-container>
                             @foreach($genreBooks->take(8) as $book)
-                                <div class="book-card book-card-small relative flex-shrink-0 bg-gray-800 rounded-xl overflow-hidden shadow-xl cursor-pointer"
-                                     @click="window.location.href='{{ route('books.show', $book) }}'">
+                                <a href="{{ route('books.show', $book) }}" class="block">
+                                    <div class="book-card book-card-small relative flex-shrink-0 bg-gray-800 rounded-xl overflow-hidden shadow-xl cursor-pointer hover:scale-105 transition-transform duration-300">
                                     
                                     <!-- Genre Badge -->
                                     <div class="absolute top-2 left-2 z-10">
@@ -788,6 +788,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                </a>
                             @endforeach
                             </div>
                             <button class="scroll-btn scroll-btn-right" onclick="scrollContainer(this, 'right')">
@@ -814,8 +815,8 @@
                         </button>
                         <div class="section-scroll flex gap-4 pb-4" data-scroll-container>
                         @foreach($aiRecommendations as $recommendation)
-                            <div class="book-card book-card-medium relative flex-shrink-0 bg-gray-800 rounded-xl overflow-hidden shadow-xl cursor-pointer"
-                                 @click="window.location.href='{{ route('books.show', $recommendation['book']) }}'">
+                            <a href="{{ route('books.show', $recommendation['book']) }}" class="block">
+                                <div class="book-card book-card-medium relative flex-shrink-0 bg-gray-800 rounded-xl overflow-hidden shadow-xl cursor-pointer hover:scale-105 transition-transform duration-300">
                                 
                                 <!-- AI Badge -->
                                 <div class="absolute top-2 left-2 z-10">
@@ -863,6 +864,7 @@
                                     </div>
                                 </div>
                             </div>
+                            </a>
                         @endforeach
                         </div>
                         <button class="scroll-btn scroll-btn-right" onclick="scrollContainer(this, 'right')">
@@ -981,6 +983,15 @@
     </footer>
 
     <script>
+        // Set authentication status for JavaScript
+        @if(auth()->check())
+            window.isAuthenticated = true;
+            window.currentUserId = {{ auth()->id() }};
+        @else
+            window.isAuthenticated = false;
+            window.currentUserId = null;
+        @endif
+        
         // OpenAI Analysis Function with extensive logging
         async function performAIAnalysis() {
             console.log('🚀 [OpenAI] === STARTING AI ANALYSIS ===');
@@ -1196,24 +1207,30 @@
                             <p class="text-gray-200 text-sm">${rec.reason}</p>
                         </div>
                         
-                        <!-- Actions -->
-                        <div class="space-y-2">
-                            <a href="/books/${rec.book.id}" 
-                               class="block w-full text-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium">
-                                📖 Details ansehen
-                            </a>
-                            ${rec.book.status === 'verfügbar' 
-                                ? `<form method="POST" action="/loans" class="inline w-full">
-                                     <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''}">
-                                     <input type="hidden" name="book_id" value="${rec.book.id}">
-                                     <button type="submit" 
-                                             class="w-full px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all font-medium">
-                                         📚 Ausleihen
-                                     </button>
-                                   </form>`
-                                : '<div class="w-full px-4 py-2 bg-gray-600 text-gray-300 rounded-lg text-center text-sm">Nicht verfügbar</div>'
-                            }
-                        </div>
+                                <!-- Actions -->
+        <div class="space-y-2">
+            <a href="/books/${rec.book.id}" 
+               class="block w-full text-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium">
+                📖 Details ansehen
+            </a>
+            ${rec.book.status === 'verfügbar' 
+                ? (window.isAuthenticated 
+                    ? `<form method="POST" action="/loans" class="inline w-full">
+                         <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''}">
+                         <input type="hidden" name="book_id" value="${rec.book.id}">
+                         <button type="submit" 
+                                 class="w-full px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all font-medium">
+                             📚 Ausleihen
+                         </button>
+                       </form>`
+                    : `<a href="/login" 
+                         class="block w-full text-center px-4 py-2 bg-gradient-to-r from-yellow-600 to-orange-600 text-white rounded-lg hover:from-yellow-700 hover:to-orange-700 transition-all font-medium">
+                         🔐 Anmelden zum Ausleihen
+                       </a>`
+                  )
+                : '<div class="w-full px-4 py-2 bg-gray-600 text-gray-300 rounded-lg text-center text-sm">Nicht verfügbar</div>'
+            }
+        </div>
                     </div>
                 </div>
             `;
@@ -1221,12 +1238,65 @@
             return card;
         }
 
-        // Attach event listener
+        // Function to update hero book when carousel book is clicked
+        function updateHeroBook(bookData) {
+            // Update hero title and info
+            const heroTitle = document.querySelector('.hero-book-title');
+            const heroAuthor = document.querySelector('.hero-book-author');
+            const heroDescription = document.querySelector('.hero-book-description');
+            const heroImage = document.querySelector('.hero-background');
+            const loanLink = document.querySelector('.hero-loan-link');
+            
+            if (heroTitle) heroTitle.textContent = bookData.title;
+            if (heroAuthor) heroAuthor.textContent = bookData.author;
+            if (heroDescription) heroDescription.textContent = bookData.description;
+            
+            // Update background image
+            if (heroImage && bookData.image) {
+                const imageUrl = bookData.image.startsWith('images/') 
+                    ? `/bookshare/${bookData.image}`
+                    : `/bookshare/storage/${bookData.image}`;
+                heroImage.style.backgroundImage = `url('${imageUrl}')`;
+            }
+            
+            // Update loan link
+            if (loanLink) {
+                // Update link to point to book details page
+                loanLink.href = `/bookshare/books/${bookData.id}`;
+                
+                // Update button visibility based on auth status and book availability
+                const registerLink = document.querySelector('.hero-register-link');
+                
+                if (window.isAuthenticated) {
+                    if (bookData.status === 'verfügbar' && bookData.owner_id != window.currentUserId) {
+                        if (loanLink) loanLink.style.display = 'inline-block';
+                        if (registerLink) registerLink.style.display = 'none';
+                    } else {
+                        if (loanLink) loanLink.style.display = 'none';
+                        if (registerLink) registerLink.style.display = 'none';
+                    }
+                } else {
+                    if (loanLink) loanLink.style.display = 'none';
+                    if (registerLink) registerLink.style.display = 'inline-block';
+                }
+            }
+        }
+        
+        // Attach event listeners
         document.addEventListener('DOMContentLoaded', function() {
             const aiBtn = document.getElementById('aiAnalysisBtn');
             if (aiBtn) {
                 aiBtn.addEventListener('click', performAIAnalysis);
             }
+            
+            // Add click listeners to book cards
+            document.querySelectorAll('.book-selector').forEach(card => {
+                card.addEventListener('click', function() {
+                    const bookId = this.dataset.bookId;
+                    // Navigate to book detail page
+                    window.location.href = `/books/${bookId}`;
+                });
+            });
         });
 
         // Scroll container function for buttons
@@ -1397,7 +1467,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('ratings.user') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-200 hover:bg-blue-500/20 hover:text-blue-300 transition-all duration-200 group">
+                        <a href="{{ route('ratings.user', auth()->user()) }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-200 hover:bg-blue-500/20 hover:text-blue-300 transition-all duration-200 group">
                             <svg class="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                             </svg>
