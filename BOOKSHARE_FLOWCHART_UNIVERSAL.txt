@@ -1,0 +1,670 @@
+================================================================================
+                    BOOKSHARE APPLICATION - COMPREHENSIVE FLOWCHART
+                              (Universal Compatibility)
+================================================================================
+
++-----------------------------------------------------------------------------+
+|                                OVERVIEW                                     |
++-----------------------------------------------------------------------------+
+
+BookShare is a Laravel-based book sharing platform that allows users to:
+- Share books with the community
+- Request and lend books
+- Communicate through messaging
+- Rate books and receive AI-powered recommendations
+- Manage their personal book collections
+
+================================================================================
+                            SYSTEM ARCHITECTURE
+================================================================================
+
++-----------------------------------------------------------------------------+
+|                           FRONTEND LAYER                                   |
++-----------------------------------------------------------------------------+
+
+LAYOUTS:
+|
++-- app.blade.php (Main Application Layout)
+|   |-- Dark/Light Mode Support
+|   |-- Responsive Navigation
+|   |-- Collapsible User Sidebar
+|   +-- CSRF Protection
+|
++-- guest.blade.php (Authentication Pages)
+|   |-- Login/Register Forms
+|   +-- Centered Layout Design
+|
++-- navigation.blade.php (Main Navigation)
+    |-- BookShare Logo/Branding
+    |-- Dashboard Link
+    |-- Books Management Link
+    |-- Loans Management Link
+    |-- Conversations Link
+    |-- User Profile Dropdown
+    +-- Responsive Mobile Menu
+
+MAIN VIEWS:
+|
++-- Authentication Views (auth/)
+|   |-- login.blade.php
+|   |-- register.blade.php
+|   |-- forgot-password.blade.php
+|   |-- reset-password.blade.php
+|   +-- verify-email.blade.php
+|
++-- Book Management (books/)
+|   |-- index.blade.php (User's Book Collection)
+|   |-- create.blade.php (Add New Book)
+|   |-- edit.blade.php (Edit Book Details)
+|   +-- show.blade.php (Book Details & Actions)
+|
++-- Loan Management (loans/)
+|   |-- index.blade.php (Loan History & Active Loans)
+|   +-- show.blade.php (Detailed Loan Information)
+|
++-- Messaging System (conversations/)
+|   |-- index.blade.php (Conversation List)
+|   +-- show.blade.php (Message Thread)
+|
++-- Rating System (ratings/)
+|   |-- show.blade.php (Book Ratings Display)
+|   +-- user-ratings.blade.php (User Rating History)
+|
++-- Static Pages (pages/)
+|   |-- about.blade.php
+|   |-- blog.blade.php
+|   |-- categories.blade.php
+|   |-- contact.blade.php
+|   |-- help.blade.php
+|   |-- imprint.blade.php
+|   |-- new-books.blade.php
+|   |-- popular-books.blade.php
+|   |-- privacy.blade.php
+|   +-- support.blade.php
+|
++-- Main Pages
+|   |-- welcome.blade.php (Landing Page with AI Recommendations)
+|   |-- dashboard.blade.php (User Dashboard)
+|   +-- recommendations.blade.php (AI-Powered Book Recommendations)
+|
++-- Components (components/)
+    |-- application-logo.blade.php
+    |-- star-rating.blade.php
+    |-- modal.blade.php
+    |-- primary-button.blade.php
+    |-- secondary-button.blade.php
+    +-- Various Form Components
+
++-----------------------------------------------------------------------------+
+|                            BACKEND LAYER                                   |
++-----------------------------------------------------------------------------+
+
+CONTROLLER LAYER:
+|
++-- AuthenticatedSessionController
+|   |-- create() --> Show login form
+|   |-- store() --> Process login & redirect to welcome
+|   +-- destroy() --> Logout user
+|
++-- RegisteredUserController
+|   |-- create() --> Show registration form
+|   +-- store() --> Create new user account
+|
++-- BookController
+|   |-- index() --> Display user's books
+|   |-- create() --> Show add book form
+|   |-- store() --> Save new book with AI categorization
+|   |-- show() --> Display book details & loan options
+|   |-- edit() --> Show edit form
+|   |-- update() --> Update book information
+|   +-- destroy() --> Delete book
+|
++-- LoanController
+|   |-- index() --> Show loan history (borrowed & lent)
+|   |-- store() --> Create loan request
+|   |-- show() --> Display loan details
+|   |-- update() --> Update loan status (approve/reject/return)
+|   +-- destroy() --> Cancel loan request
+|
++-- ConversationController
+|   |-- index() --> List all conversations
+|   |-- show() --> Display conversation messages
+|   |-- sendMessage() --> Send new message
+|   |-- sendQuickMessage() --> Send quick reply
+|   |-- markAllAsRead() --> Mark messages as read
+|   |-- archive() --> Archive conversation
+|   |-- showForLoan() --> Get conversation for specific loan
+|   |-- createForLoan() --> Create conversation for loan
+|   +-- getUnreadCount() --> API endpoint for unread count
+|
++-- RatingController
+|   |-- index() --> Display rating overview
+|   |-- store() --> Submit book rating
+|   |-- show() --> Display book ratings
+|   |-- userRatings() --> Show user's rating history
+|   +-- destroy() --> Delete user's rating
+|
++-- WelcomeController
+|   |-- index() --> Landing page with personalized content
+|   |-- recommendations() --> Show recommendations page
+|   |-- getRecommendations() --> AJAX recommendations
+|   |-- getAIGenreRecommendations() --> AI genre-based recommendations
+|   +-- getAdvancedAIRecommendations() --> Advanced AI recommendations
+|
++-- ProfileController
+    |-- edit() --> Show profile edit form
+    |-- update() --> Update user profile
+    +-- destroy() --> Delete user account
+
+SERVICE LAYER:
+|
++-- BookRecommendationService
+|   |-- getPersonalizedRecommendations() --> User-based recommendations
+|   |-- analyzeUserPreferences() --> Analyze user behavior
+|   |-- findSimilarUsers() --> Collaborative filtering
+|   |-- getCollaborativeRecommendations() --> Social recommendations
+|   |-- getContentBasedRecommendations() --> Content similarity
+|   |-- getTrendingBooks() --> Popular books analysis
+|   |-- getAIPersonalizedRecommendations() --> OpenAI integration
+|   |-- getAdvancedAIRecommendations() --> Advanced AI analysis
+|   +-- generateAdvancedUserProfile() --> Deep user profiling
+|
++-- BookCategorizationService
+    |-- categorizeBook() --> Automatic genre classification
+    |-- tryAICategorization() --> AI-based categorization
+    |-- keywordBasedCategorization() --> Keyword matching
+    +-- getRecommendations() --> Category-based suggestions
+
++-----------------------------------------------------------------------------+
+|                           DATA LAYER                                       |
++-----------------------------------------------------------------------------+
+
+DATABASE MODELS & RELATIONSHIPS:
+
+USER MODEL:
+|
++-- Properties:
+|   |-- id (Primary Key)
+|   |-- name, email, password
+|   |-- avatar (Profile Image)
+|   |-- last_seen_at, is_online, status
+|   |-- message_notifications, email_notifications
+|   +-- Timestamps
+|
++-- Relationships:
+|   |-- ownedBooks() --> hasMany(Book, 'owner_id')
+|   |-- borrowedLoans() --> hasMany(Loan, 'borrower_id')
+|   |-- lentLoans() --> hasMany(Loan, 'lender_id')
+|   |-- ratings() --> hasMany(Rating)
+|   |-- conversations() --> hasMany(Conversation)
+|   +-- sentMessages() --> hasMany(Message, 'sender_id')
+|
++-- Methods:
+    |-- updateLastSeen() --> Update online presence
+    |-- setOffline() --> Set user offline
+    |-- isOnline() --> Check online status
+    +-- getOnlineStatusAttribute() --> Get formatted status
+
+BOOK MODEL:
+|
++-- Properties:
+|   |-- id (Primary Key)
+|   |-- title, author, isbn
+|   |-- description, genre, publication_year
+|   |-- language, condition
+|   |-- status (verfuegbar, ausgeliehen, reserviert, angefragt)
+|   |-- owner_id (Foreign Key --> users.id)
+|   |-- image_path
+|   +-- Timestamps
+|
++-- Status Constants:
+|   |-- STATUS_VERFUEGBAR (verfuegbar)
+|   |-- STATUS_AUSGELIEHEN (ausgeliehen)
+|   |-- STATUS_RESERVIERT (reserviert)
+|   +-- STATUS_ANGEFRAGT (angefragt)
+|
++-- Relationships:
+|   |-- owner() --> belongsTo(User, 'owner_id')
+|   |-- loans() --> hasMany(Loan)
+|   |-- currentLoan() --> hasMany(Loan) where status='aktiv'
+|   +-- ratings() --> hasMany(Rating)
+|
++-- Scopes:
+    |-- scopeAvailable() --> Filter available books
+    +-- scopeByGenre() --> Filter by genre
+
+LOAN MODEL:
+|
++-- Properties:
+|   |-- id (Primary Key)
+|   |-- book_id (Foreign Key --> books.id)
+|   |-- borrower_id (Foreign Key --> users.id)
+|   |-- lender_id (Foreign Key --> users.id)
+|   |-- loan_date, due_date, return_date
+|   |-- status (angefragt, aktiv, abgelehnt, storniert, zurueckgegeben, ueberfaellig)
+|   |-- notes, message, contact_info
+|   |-- pickup_method, requested_duration_weeks
+|   |-- lender_response, responded_at
+|   +-- Timestamps
+|
++-- Status Constants:
+|   |-- STATUS_ANGEFRAGT (angefragt)
+|   |-- STATUS_AKTIV (aktiv)
+|   |-- STATUS_ABGELEHNT (abgelehnt)
+|   |-- STATUS_STORNIERT (storniert)
+|   |-- STATUS_ZURUECKGEGEBEN (zurueckgegeben)
+|   +-- STATUS_UEBERFAELLIG (ueberfaellig)
+|
++-- Relationships:
+|   |-- book() --> belongsTo(Book)
+|   |-- borrower() --> belongsTo(User, 'borrower_id')
+|   |-- lender() --> belongsTo(User, 'lender_id')
+|   +-- conversation() --> hasOne(Conversation)
+|
++-- Scopes:
+    |-- scopeActive() --> Filter active loans
+    |-- scopePending() --> Filter pending requests
+    +-- scopeOverdue() --> Filter overdue loans
+
+CONVERSATION MODEL:
+|
++-- Properties:
+|   |-- id (Primary Key)
+|   |-- loan_id (Foreign Key --> loans.id, Unique)
+|   |-- participant_1_id (Foreign Key --> users.id)
+|   |-- participant_2_id (Foreign Key --> users.id)
+|   |-- last_message_at
+|   |-- is_active
+|   +-- Timestamps
+|
++-- Relationships:
+|   |-- loan() --> belongsTo(Loan)
+|   |-- participant1() --> belongsTo(User, 'participant_1_id')
+|   |-- participant2() --> belongsTo(User, 'participant_2_id')
+|   |-- messages() --> hasMany(Message)
+|   +-- latestMessage() --> hasMany(Message).latest().limit(1)
+|
++-- Methods:
+|   |-- getOtherParticipant() --> Get conversation partner
+|   |-- isParticipant() --> Check if user is participant
+|   +-- getUnreadCount() --> Count unread messages
+|
++-- Scopes:
+    +-- scopeForUser() --> Filter conversations for specific user
+
+MESSAGE MODEL:
+|
++-- Properties:
+|   |-- id (Primary Key)
+|   |-- conversation_id (Foreign Key --> conversations.id)
+|   |-- sender_id (Foreign Key --> users.id)
+|   |-- content (Message text)
+|   |-- is_read
+|   +-- Timestamps
+|
++-- Relationships:
+    |-- conversation() --> belongsTo(Conversation)
+    +-- sender() --> belongsTo(User, 'sender_id')
+
+RATING MODEL:
+|
++-- Properties:
+|   |-- id (Primary Key)
+|   |-- user_id (Foreign Key --> users.id)
+|   |-- book_id (Foreign Key --> books.id)
+|   |-- rating (1-5 stars)
+|   |-- review (Optional text review)
+|   +-- Timestamps
+|
++-- Relationships:
+|   |-- user() --> belongsTo(User)
+|   +-- book() --> belongsTo(Book)
+|
++-- Constraints:
+    +-- Unique index on (user_id, book_id)
+
++-----------------------------------------------------------------------------+
+|                            ROUTING SYSTEM                                  |
++-----------------------------------------------------------------------------+
+
+PUBLIC ROUTES:
+|-- GET / --> WelcomeController@index (Landing page)
+|-- GET /test-images --> View test images
+|-- GET /about --> About page
+|-- GET /blog --> Blog page
+|-- GET /help --> Help page
+|-- GET /categories --> Categories page
+|-- GET /new-books --> New books page
+|-- GET /popular-books --> Popular books page
+|-- GET /contact --> Contact page
+|-- GET /support --> Support page
+|-- GET /privacy --> Privacy policy
++-- GET /imprint --> Imprint page
+
+AUTHENTICATED ROUTES (middleware: auth):
+|
++-- Profile Management:
+|   |-- GET /profile --> ProfileController@edit
+|   |-- PATCH /profile --> ProfileController@update
+|   +-- DELETE /profile --> ProfileController@destroy
+|
++-- Book Management (Resource Routes):
+|   |-- GET /books --> BookController@index
+|   |-- GET /books/create --> BookController@create
+|   |-- POST /books --> BookController@store
+|   |-- GET /books/{book} --> BookController@show
+|   |-- GET /books/{book}/edit --> BookController@edit
+|   |-- PATCH /books/{book} --> BookController@update
+|   +-- DELETE /books/{book} --> BookController@destroy
+|
++-- Loan Management:
+|   |-- GET /loans --> LoanController@index
+|   |-- POST /loans --> LoanController@store
+|   |-- GET /loans/{loan} --> LoanController@show
+|   |-- PATCH /loans/{loan} --> LoanController@update
+|   +-- DELETE /loans/{loan} --> LoanController@destroy
+|
++-- Messaging System:
+|   |-- GET /conversations --> ConversationController@index
+|   |-- GET /conversations/{conversation} --> ConversationController@show
+|   |-- POST /conversations/{conversation}/send --> ConversationController@sendMessage
+|   |-- POST /conversations/{conversation}/quick --> ConversationController@sendQuickMessage
+|   |-- PATCH /conversations/{conversation}/read --> ConversationController@markAllAsRead
+|   |-- PATCH /conversations/{conversation}/archive --> ConversationController@archive
+|   |-- GET /conversations/loan/{loan} --> ConversationController@showForLoan
+|   +-- POST /conversations/loan/{loan}/create --> ConversationController@createForLoan
+|
++-- Rating System:
+|   |-- GET /ratings --> RatingController@index
+|   |-- GET /ratings/user/{user} --> RatingController@userRatings
+|   |-- POST /books/{book}/rate --> RatingController@store
+|   |-- DELETE /books/{book}/ratings --> RatingController@destroy
+|   +-- GET /books/{book}/ratings --> RatingController@show
+|
++-- AI Recommendation System:
+|   |-- GET /recommendations --> WelcomeController@recommendations
+|   |-- GET /api/recommendations --> WelcomeController@getRecommendations
+|   |-- GET /api/ai-genre-recommendations/{genre} --> WelcomeController@getAIGenreRecommendations
+|   +-- GET /api/advanced-ai-recommendations --> WelcomeController@getAdvancedAIRecommendations
+|
++-- API Endpoints:
+|   +-- GET /api/unread-count --> ConversationController@getUnreadCount
+|
++-- Debug Routes:
+    |-- GET /debug/openai-test --> OpenAI integration test
+    +-- GET /debug/full-ai-test --> Full AI recommendation test
+
+AUTHENTICATION ROUTES (auth.php):
+|-- GET /login --> AuthenticatedSessionController@create
+|-- POST /login --> AuthenticatedSessionController@store
+|-- POST /logout --> AuthenticatedSessionController@destroy
+|-- GET /register --> RegisteredUserController@create
+|-- POST /register --> RegisteredUserController@store
+|-- GET /forgot-password --> PasswordResetLinkController@create
+|-- POST /forgot-password --> PasswordResetLinkController@store
+|-- GET /reset-password/{token} --> NewPasswordController@create
+|-- POST /reset-password --> NewPasswordController@store
+|-- GET /verify-email --> EmailVerificationPromptController@__invoke
+|-- GET /verify-email/{id}/{hash} --> VerifyEmailController@__invoke
+|-- POST /email/verification-notification --> EmailVerificationNotificationController@store
+|-- GET /confirm-password --> ConfirmablePasswordController@show
+|-- POST /confirm-password --> ConfirmablePasswordController@store
++-- PUT /password --> PasswordController@update
+
++-----------------------------------------------------------------------------+
+|                           BUSINESS FLOW                                    |
++-----------------------------------------------------------------------------+
+
+USER REGISTRATION & AUTHENTICATION FLOW:
+1. User visits landing page (/)
+2. Clicks "Register" --> RegisteredUserController@create
+3. Fills registration form --> RegisteredUserController@store
+4. Account created --> Redirected to email verification
+5. User verifies email --> VerifyEmailController@__invoke
+6. User can now login --> AuthenticatedSessionController@store
+7. Successful login --> Redirected to welcome page with personalized content
+
+BOOK SHARING FLOW:
+1. User adds book to collection:
+   |-- Navigate to /books/create
+   |-- Fill book details (title, author, description, etc.)
+   |-- BookController@store --> Calls BookCategorizationService
+   |-- AI categorization applied
+   +-- Book saved with status "verfuegbar"
+
+2. Book discovery:
+   |-- Other users browse available books
+   |-- View book details --> BookController@show
+   |-- See ratings and reviews
+   +-- Option to request loan
+
+3. Loan request process:
+   |-- Borrower clicks "Request Loan"
+   |-- Fills loan request form (duration, message, pickup method)
+   |-- LoanController@store creates loan with status "angefragt"
+   |-- Book status changes to "angefragt"
+   |-- Automatic conversation creation
+   +-- Lender receives notification
+
+4. Loan approval process:
+   |-- Lender views loan request --> LoanController@show
+   |-- Reviews borrower details and message
+   |-- Approves or rejects --> LoanController@update
+   |-- If approved:
+   |   |-- Loan status --> "aktiv"
+   |   |-- Book status --> "ausgeliehen"
+   |   |-- Due date calculated
+   |   +-- Conversation activated
+   +-- If rejected:
+       |-- Loan status --> "abgelehnt"
+       +-- Book status --> "verfuegbar"
+
+5. Book return process:
+   |-- Borrower initiates return --> LoanController@update
+   |-- Loan status --> "zurueckgegeben"
+   |-- Book status --> "verfuegbar"
+   |-- Return date recorded
+   +-- Option for rating appears
+
+MESSAGING SYSTEM FLOW:
+1. Conversation creation:
+   |-- Automatically created when loan is requested
+   |-- Links loan, borrower, and lender
+   +-- Initial system message sent
+
+2. Message exchange:
+   |-- Users send messages --> ConversationController@sendMessage
+   |-- Real-time message delivery
+   |-- Read status tracking
+   |-- Quick message templates available
+   +-- Unread count updates
+
+3. Conversation management:
+   |-- Mark messages as read --> ConversationController@markAllAsRead
+   |-- Archive conversations --> ConversationController@archive
+   +-- View conversation history --> ConversationController@index
+
+RATING SYSTEM FLOW:
+1. Rating submission:
+   |-- After successful book return
+   |-- User rates book (1-5 stars) --> RatingController@store
+   |-- Optional written review
+   +-- Rating affects book recommendations
+
+2. Rating display:
+   |-- Average rating calculated
+   |-- Displayed on book details --> RatingController@show
+   |-- User rating history --> RatingController@userRatings
+   +-- Influences trending books algorithm
+
+AI RECOMMENDATION FLOW:
+1. Data collection:
+   |-- User reading preferences from ratings
+   |-- Borrowed books history
+   |-- Owned books analysis
+   |-- Loan patterns
+   +-- Genre preferences
+
+2. Recommendation generation:
+   |-- Collaborative filtering (similar users)
+   |-- Content-based filtering (similar books)
+   |-- Trending books analysis
+   |-- OpenAI integration for advanced recommendations
+   +-- Genre-specific AI recommendations
+
+3. Recommendation delivery:
+   |-- Welcome page personalization
+   |-- Dedicated recommendations page
+   |-- AJAX-powered dynamic updates
+   +-- Genre-based browsing
+
++-----------------------------------------------------------------------------+
+|                        EXTERNAL INTEGRATIONS                               |
++-----------------------------------------------------------------------------+
+
+OPENAI INTEGRATION:
+|-- Model: gpt-4o-mini
+|-- Purpose: Advanced book recommendations
+|-- Implementation:
+|   |-- BookRecommendationService@getAdvancedAIRecommendations()
+|   |-- User profile analysis
+|   |-- Reading pattern recognition
+|   |-- Personalized recommendation generation
+|   +-- Genre-specific suggestions
+|
+|-- Input Data:
+|   |-- User reading history
+|   |-- Book ratings and reviews
+|   |-- Owned books collection
+|   |-- Loan patterns
+|   +-- Preference analysis
+|
++-- Output:
+    |-- Scored book recommendations
+    |-- Reasoning for each recommendation
+    +-- Diverse genre suggestions
+
+EMAIL SYSTEM:
+|-- Loan reminder notifications
+|-- Email verification
+|-- Password reset emails
++-- User notification preferences
+
+FILE STORAGE:
+|-- Book cover images in public/images/
+|-- User avatar storage
++-- Static assets management
+
++-----------------------------------------------------------------------------+
+|                         SECURITY FEATURES                                  |
++-----------------------------------------------------------------------------+
+
+AUTHENTICATION & AUTHORIZATION:
+|-- Laravel's built-in authentication system
+|-- Password hashing with bcrypt
+|-- Email verification requirement
+|-- CSRF protection on all forms
+|-- Session management
+|-- Route protection with middleware
++-- User input validation and sanitization
+
+DATA PROTECTION:
+|-- Database constraints and foreign keys
+|-- Soft deletes for important data
+|-- Input validation at controller level
+|-- SQL injection prevention through Eloquent ORM
++-- XSS protection through Blade templating
+
+PRIVACY FEATURES:
+|-- User profile privacy controls
+|-- Notification preferences
+|-- Data deletion capabilities
++-- GDPR compliance considerations
+
++-----------------------------------------------------------------------------+
+|                        TECHNICAL SPECIFICATIONS                            |
++-----------------------------------------------------------------------------+
+
+TECHNOLOGY STACK:
+|-- Backend: Laravel 11.x (PHP)
+|-- Frontend: Blade Templates + Tailwind CSS
+|-- Database: MySQL/PostgreSQL
+|-- JavaScript: Alpine.js for interactivity
+|-- Build Tool: Vite for asset compilation
+|-- CSS Framework: Tailwind CSS with dark mode
+|-- Icons: SVG icons integrated in Blade components
++-- AI Integration: OpenAI API via Laravel OpenAI package
+
+DATABASE DESIGN:
+|-- Normalized relational structure
+|-- Foreign key constraints
+|-- Indexed columns for performance
+|-- Enum fields for status management
+|-- Timestamp tracking for all entities
++-- Unique constraints where appropriate
+
+PERFORMANCE FEATURES:
+|-- Database query optimization
+|-- Eager loading for relationships
+|-- Caching for recommendation algorithms
+|-- Image optimization for book covers
+|-- Lazy loading for large lists
++-- AJAX for dynamic content updates
+
+RESPONSIVE DESIGN:
+|-- Mobile-first approach
+|-- Collapsible navigation
+|-- Touch-friendly interfaces
+|-- Adaptive layouts for all screen sizes
++-- Progressive web app considerations
+
++-----------------------------------------------------------------------------+
+|                           FUTURE ENHANCEMENTS                              |
++-----------------------------------------------------------------------------+
+
+PLANNED FEATURES:
+|-- Real-time notifications with WebSockets
+|-- Book barcode scanning for easy addition
+|-- Geographic location-based recommendations
+|-- Book clubs and reading groups
+|-- Social features (friends, followers)
+|-- Advanced search with filters
+|-- Book wishlist functionality
+|-- Reading statistics and analytics
+|-- Multi-language support (Farsi translation planned)
++-- Mobile app development
+
+TECHNICAL IMPROVEMENTS:
+|-- API development for mobile apps
+|-- Advanced caching strategies
+|-- Search optimization with Elasticsearch
+|-- Microservices architecture consideration
+|-- Docker containerization
+|-- Automated testing coverage
+|-- CI/CD pipeline implementation
++-- Performance monitoring and analytics
+
+================================================================================
+                               END OF FLOWCHART
+================================================================================
+
+This comprehensive flowchart represents the complete architecture, data flow,
+and functionality of the BookShare application using universal ASCII characters
+for maximum compatibility across all text applications and platforms.
+The system demonstrates a well-structured Laravel application with modern 
+features including AI integration, real-time messaging, and responsive design 
+principles.
+
+LEGEND:
+|   = Vertical connection
++   = Branch or end point  
+--  = Horizontal connection
+--> = Direction/Flow indicator
+
+This format ensures readability in:
+- Basic text editors (Notepad, vim, nano)
+- IDEs and code editors
+- Email clients
+- Documentation systems
+- Terminal/console applications
+- Mobile text viewers 
