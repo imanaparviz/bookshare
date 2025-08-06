@@ -1,0 +1,483 @@
+================================================================================
+                    📚 BOOKSHARE - VISUELLE DIAGRAMME FÜR PRÄSENTATION 📚
+                              Zusätzliche Präsentations-Visuals
+================================================================================
+
+🔄 BENUTZER-FLOW DIAGRAMM
+════════════════════════════════════════════════════════════════════════════
+
+                                START
+                                  │
+                                  ▼
+                        ┌─────────────────────┐
+                        │   📱 APP STARTEN    │
+                        └─────────────────────┘
+                                  │
+                                  ▼
+                        ┌─────────────────────┐
+                        │  🔐 REGISTRIERUNG   │
+                        │     & LOGIN         │
+                        └─────────────────────┘
+                                  │
+                                  ▼
+                        ┌─────────────────────┐
+                        │  🏠 DASHBOARD       │
+                        │    STARTSEITE       │
+                        └─────────────────────┘
+                                  │
+                    ┌─────────────┼─────────────┐
+                    ▼             ▼             ▼
+          ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+          │  📚 BUCH        │ │  🔍 BÜCHER      │ │  💬 NACHRICHTEN │
+          │  HINZUFÜGEN     │ │  DURCHSUCHEN    │ │  & VERWALTEN    │
+          └─────────────────┘ └─────────────────┘ └─────────────────┘
+                    │             │             │
+                    ▼             ▼             ▼
+          ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+          │  🤖 AI AUTO-    │ │  🤝 AUSLEIH-    │ │  ⭐ BEWERTUNG   │
+          │  KATEGORISIERUNG│ │  ANFRAGE        │ │  & FEEDBACK     │
+          └─────────────────┘ └─────────────────┘ └─────────────────┘
+                    │             │             │
+                    └─────────────┼─────────────┘
+                                  ▼
+                        ┌─────────────────────┐
+                        │  🎯 AI EMPFEHLUNGEN │
+                        │   & VERBESSERUNG    │
+                        └─────────────────────┘
+                                  │
+                                  ▼
+                                 END
+
+================================================================================
+
+🏗️ SYSTEM ARCHITEKTUR - SCHICHTENMODELL
+════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            🎨 PRÄSENTATIONSSCHICHT                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  📱 RESPONSIVE UI          🌙 DARK/LIGHT MODE         🔧 KOMPONENTEN        │
+│  ┌─────────────────┐       ┌─────────────────┐        ┌─────────────────┐   │
+│  │ • Mobile First  │       │ • Auto-Switch   │        │ • Blade Views   │   │
+│  │ • Touch-Friendly│       │ • User Pref.    │        │ • Tailwind CSS  │   │
+│  │ • Responsive    │       │ • Eye-Comfort   │        │ • Alpine.js     │   │
+│  └─────────────────┘       └─────────────────┘        └─────────────────┘   │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                            ⚙️ GESCHÄFTSLOGIK-SCHICHT                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  🎯 CONTROLLER             📊 SERVICES                🔒 MIDDLEWARE          │
+│  ┌─────────────────┐       ┌─────────────────┐        ┌─────────────────┐   │
+│  │ • BookController│       │ • AI Recommend. │        │ • Auth Guard    │   │
+│  │ • LoanController│       │ • Book Category │        │ • CSRF Protect  │   │
+│  │ • ChatController│       │ • Notification  │        │ • Rate Limiting │   │
+│  │ • UserController│       │ • Analytics     │        │ • Input Valid.  │   │
+│  └─────────────────┘       └─────────────────┘        └─────────────────┘   │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                             💾 DATENZUGRIFFS-SCHICHT                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  📋 ELOQUENT MODELS        🔗 RELATIONSHIPS            📊 REPOSITORIES       │
+│  ┌─────────────────┐       ┌─────────────────┐        ┌─────────────────┐   │
+│  │ • User Model    │       │ • One-to-Many   │        │ • Query Builder │   │
+│  │ • Book Model    │       │ • Many-to-Many  │        │ • Caching Layer │   │
+│  │ • Loan Model    │       │ • Polymorphic   │        │ • Optimization  │   │
+│  │ • Message Model │       │ • Constraints   │        │ • Eager Loading │   │
+│  └─────────────────┘       └─────────────────┘        └─────────────────┘   │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                              🗄️ DATENBANK-SCHICHT                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  🏗️ MYSQL DATABASE         📊 INDIZIERUNG             🔒 SICHERHEIT         │
+│  ┌─────────────────┐       ┌─────────────────┐        ┌─────────────────┐   │
+│  │ • ACID Compliant│       │ • Primary Keys  │        │ • Foreign Keys  │   │
+│  │ • Transactions  │       │ • Search Index  │        │ • Data Encrypt. │   │
+│  │ • Normalization │       │ • Composite Idx │        │ • Access Control│   │
+│  │ • Backup Ready  │       │ • Performance   │        │ • GDPR Ready    │   │
+│  └─────────────────┘       └─────────────────┘        └─────────────────┘   │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+
+🤖 KI-EMPFEHLUNGSSYSTEM - ALGORITHMUS-FLOW
+════════════════════════════════════════════════════════════════════════════
+
+                        📊 DATENSAMMLUNG
+                              │
+                              ▼
+               ┌──────────────────────────────────┐
+               │     📚 BENUTZER-VERHALTEN        │
+               │                                  │
+               │  • Ausgeliehene Bücher          │
+               │  • Bewertungen & Reviews        │
+               │  • Suchverlauf                  │
+               │  • Eigene Buchsammlung          │
+               │  • Lesezeit-Muster              │
+               └──────────────────────────────────┘
+                              │
+                              ▼
+            ┌─────────────────────────────────────────┐
+            │        🔄 DATENVERARBEITUNG            │
+            └─────────────────────────────────────────┘
+                              │
+          ┌───────────────────┼───────────────────┐
+          ▼                   ▼                   ▼
+    ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+    │ 👥 KOLLABOR. │   │ 📖 CONTENT  │   │ 📈 TRENDING │
+    │ FILTERING   │   │ BASED       │   │ ANALYSE     │
+    │             │   │ FILTERING   │   │             │
+    │ Ähnliche    │   │ Genre-      │   │ Beliebte    │
+    │ Nutzer      │   │ Ähnlichkeit │   │ Bücher      │
+    │ finden      │   │ analysieren │   │ erkennen    │
+    └─────────────┘   └─────────────┘   └─────────────┘
+          │                   │                   │
+          └───────────────────┼───────────────────┘
+                              ▼
+                   ┌─────────────────────┐
+                   │   🤖 OPENAI GPT-4o  │
+                   │   INTEGRATION       │
+                   │                     │
+                   │ • Präferenz-Analyse │
+                   │ • Genre-Matching    │
+                   │ • Context Learning  │
+                   │ • Smart Reasoning   │
+                   └─────────────────────┘
+                              │
+                              ▼
+                   ┌─────────────────────┐
+                   │  🎯 FINALE          │
+                   │  EMPFEHLUNGEN       │
+                   │                     │
+                   │ 1. Top 10 Bücher    │
+                   │ 2. Begründungen     │
+                   │ 3. Confidence Score │
+                   │ 4. Genre-Vielfalt   │
+                   └─────────────────────┘
+                              │
+                              ▼
+                   ┌─────────────────────┐
+                   │  📈 FEEDBACK LOOP   │
+                   │                     │
+                   │ • User-Rating       │
+                   │ • Click-Through     │
+                   │ • Ausleih-Success   │
+                   │ • Algorithmus-Update│
+                   └─────────────────────┘
+
+================================================================================
+
+📊 DATENBANK BEZIEHUNGSDIAGRAMM (ERD)
+════════════════════════════════════════════════════════════════════════════
+
+                                USERS
+                        ┌─────────────────────┐
+                        │ 🔑 id (PK)          │
+                        │ 📧 email (UNIQUE)   │
+                        │ 👤 name             │
+                        │ 🔒 password         │
+                        │ 🖼️ avatar           │
+                        │ ⏰ last_seen_at     │
+                        │ 🔔 notifications    │
+                        │ 📅 created_at       │
+                        │ 📅 updated_at       │
+                        └─────────────────────┘
+                                │
+                 ┌──────────────┼──────────────┐
+                 │              │              │
+                 ▼              ▼              ▼
+        ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+        │     BOOKS       │ │     LOANS       │ │    RATINGS      │
+        │                 │ │                 │ │                 │
+        │ 🔑 id (PK)      │ │ 🔑 id (PK)      │ │ 🔑 id (PK)      │
+        │ 📚 title        │ │ 🔗 book_id (FK) │ │ 🔗 user_id (FK) │
+        │ ✍️ author        │ │ 🔗 borrower_id  │ │ 🔗 book_id (FK) │
+        │ 📖 isbn         │ │ 🔗 lender_id    │ │ ⭐ rating (1-5) │
+        │ 📝 description  │ │ 📅 loan_date    │ │ 📝 review       │
+        │ 🎭 genre        │ │ 📅 due_date     │ │ 📅 created_at   │
+        │ 📊 status       │ │ 📅 return_date  │ │ 📅 updated_at   │
+        │ 🔗 owner_id(FK) │ │ 📊 status       │ └─────────────────┘
+        │ 🖼️ image_path   │ │ 📝 notes        │
+        │ 📅 created_at   │ │ 📅 created_at   │
+        │ 📅 updated_at   │ │ 📅 updated_at   │
+        └─────────────────┘ └─────────────────┘
+                │                     │
+                └─────────────────────┘
+                          │
+                          ▼
+                ┌─────────────────────┐
+                │   CONVERSATIONS     │
+                │                     │
+                │ 🔑 id (PK)          │
+                │ 🔗 loan_id (FK)     │
+                │ 🔗 participant_1_id │
+                │ 🔗 participant_2_id │
+                │ ⏰ last_message_at  │
+                │ ✅ is_active        │
+                │ 📅 created_at       │
+                │ 📅 updated_at       │
+                └─────────────────────┘
+                          │
+                          ▼
+                ┌─────────────────────┐
+                │     MESSAGES        │
+                │                     │
+                │ 🔑 id (PK)          │
+                │ 🔗 conversation_id  │
+                │ 🔗 sender_id (FK)   │
+                │ 💬 content          │
+                │ 👁️ is_read          │
+                │ 📅 created_at       │
+                │ 📅 updated_at       │
+                └─────────────────────┘
+
+BEZIEHUNGEN:
+═══════════
+• User ➔ Books (1:N) - Ein User besitzt viele Bücher
+• User ➔ Loans (1:N) - Ein User kann viele Bücher ausleihen/verleihen  
+• Book ➔ Loans (1:N) - Ein Buch kann mehrere Ausleihvorgänge haben
+• Loan ➔ Conversation (1:1) - Jede Ausleihe hat eine Unterhaltung
+• Conversation ➔ Messages (1:N) - Eine Unterhaltung hat viele Nachrichten
+• User ➔ Ratings (1:N) - Ein User kann viele Bewertungen abgeben
+• Book ➔ Ratings (1:N) - Ein Buch kann viele Bewertungen erhalten
+
+================================================================================
+
+🔄 AUSLEIH-PROZESS FLUSSDIAGRAMM
+════════════════════════════════════════════════════════════════════════════
+
+                    👤 NUTZER ENTDECKT BUCH
+                              │
+                              ▼
+                    ┌─────────────────────┐
+                    │  📖 BUCH DETAILS    │
+                    │     ANZEIGEN        │
+                    └─────────────────────┘
+                              │
+                              ▼
+                      ┌───────────────┐
+                      │ 🤝 AUSLEIHE   │ ──────┐
+                      │   ANFRAGEN?   │       │
+                      └───────────────┘       │
+                              │               │
+                           ✅ JA            ❌ NEIN
+                              │               │
+                              ▼               ▼
+                    ┌─────────────────────┐   📚 WEITER
+                    │  📝 ANFRAGE-FORMULAR│   STÖBERN
+                    │     AUSFÜLLEN       │
+                    └─────────────────────┘
+                              │
+                              ▼
+                    ┌─────────────────────┐
+                    │  📤 ANFRAGE AN      │
+                    │    BESITZER         │
+                    └─────────────────────┘
+                              │
+                              ▼
+                    ┌─────────────────────┐
+                    │  🔔 BENACHRICHTIGUNG│
+                    │   AN BESITZER       │
+                    └─────────────────────┘
+                              │
+                              ▼
+                      ┌───────────────┐
+                      │ 📋 BESITZER   │ ──────┐
+                      │ ENTSCHEIDUNG? │       │
+                      └───────────────┘       │
+                              │               │
+                        ✅ GENEHMIGT      ❌ ABGELEHNT
+                              │               │
+                              ▼               ▼
+                    ┌─────────────────────┐   ┌─────────────────────┐
+                    │  ✅ AKTIVE AUSLEIHE │   │  ❌ ANFRAGE         │
+                    │     ERSTELLEN       │   │    ABGELEHNT        │
+                    └─────────────────────┘   └─────────────────────┘
+                              │                         │
+                              ▼                         ▼
+                    ┌─────────────────────┐            📚 BUCH
+                    │  💬 CHAT AKTIVIERT  │           VERFÜGBAR
+                    │   KOORDINATION      │
+                    └─────────────────────┘
+                              │
+                              ▼
+                    ┌─────────────────────┐
+                    │  📅 FRIST-TRACKING  │
+                    │    & REMINDER       │
+                    └─────────────────────┘
+                              │
+                              ▼
+                    ┌─────────────────────┐
+                    │  📤 BUCH RÜCKGABE   │
+                    │     MELDEN          │
+                    └─────────────────────┘
+                              │
+                              ▼
+                    ┌─────────────────────┐
+                    │  ⭐ BEWERTUNG       │
+                    │    OPTIONAL         │
+                    └─────────────────────┘
+                              │
+                              ▼
+                    ┌─────────────────────┐
+                    │  🎯 AI LERNT &      │
+                    │  VERBESSERT SYSTEM  │
+                    └─────────────────────┘
+
+================================================================================
+
+📱 RESPONSIVE DESIGN BREAKPOINTS
+════════════════════════════════════════════════════════════════════════════
+
+                            GERÄTE-UNTERSTÜTZUNG
+
+    📱 MOBILE               💻 TABLET              🖥️ DESKTOP
+    (< 640px)              (640px - 1024px)        (> 1024px)
+
+┌─────────────────┐      ┌─────────────────────┐  ┌─────────────────────────┐
+│                 │      │                     │  │                         │
+│ ≡ HAMBURGER     │      │ ≡ TABS              │  │ FULL NAVIGATION         │
+│   MENU          │      │                     │  │                         │
+│                 │      │ ┌─────┬─────┬─────┐ │  │ ┌─────┬─────┬─────┬───┐ │
+│ [SINGLE COLUMN] │      │ │BOOKS│LOANS│MSGS │ │  │ │BOOKS│LOANS│MSGS│PRO│ │
+│                 │      │ └─────┴─────┴─────┘ │  │ └─────┴─────┴─────┴───┘ │
+│ ┌─────────────┐ │      │                     │  │                         │
+│ │    BOOK     │ │      │ ┌─────────┬───────┐ │  │ ┌─────────┬─────────────┐ │
+│ │   CARD      │ │      │ │  BOOK   │ INFO  │ │  │ │ BOOK    │    CHAT     │ │
+│ │             │ │      │ │  GRID   │ PANEL │ │  │ │ GRID    │   SIDEBAR   │ │
+│ └─────────────┘ │      │ │         │       │ │  │ │         │             │ │
+│                 │      │ └─────────┴───────┘ │  │ └─────────┴─────────────┘ │
+│ ┌─────────────┐ │      │                     │  │                         │
+│ │   ACTION    │ │      │ ┌─────────────────┐ │  │ ┌─────────────────────┐ │
+│ │   BUTTONS   │ │      │ │ LARGE BUTTONS   │ │  │ │    FULL FEATURES    │ │
+│ └─────────────┘ │      │ └─────────────────┘ │  │ └─────────────────────┘ │
+│                 │      │                     │  │                         │
+└─────────────────┘      └─────────────────────┘  └─────────────────────────┘
+
+ANPASSUNGEN PRO GERÄT:
+════════════════════
+
+📱 MOBILE FIRST:
+• Touch-optimierte Buttons (min. 44px)
+• Swipe-Gesten für Navigation
+• Kollapsible Menüs
+• Optimierte Eingabefelder
+• Große, klare Icons
+
+💻 TABLET OPTIMIERUNG:
+• Zwei-Spalten Layout
+• Touch + Keyboard Support
+• Erweiterte Navigation
+• Sidebar-Integration
+• Optimale Bildschirmnutzung
+
+🖥️ DESKTOP VOLLFEATURES:
+• Drei-Spalten Layout möglich
+• Hover-Effekte
+• Keyboard-Shortcuts
+• Advanced Filtering
+• Multi-Window Support
+
+================================================================================
+
+🔒 SICHERHEITS-ARCHITEKTUR
+════════════════════════════════════════════════════════════════════════════
+
+                            SECURITY LAYERS
+
+          🌐 FRONTEND SECURITY           🔒 BACKEND SECURITY
+          ═══════════════════           ══════════════════
+
+    ┌─────────────────────────┐       ┌─────────────────────────┐
+    │     INPUT VALIDATION    │       │    AUTHENTICATION       │
+    │                         │       │                         │
+    │ • Client-side Checks    │ ────► │ • Laravel Sanctum       │
+    │ • XSS Prevention        │       │ • Session Management    │
+    │ • CSRF Tokens           │       │ • Password Hashing      │
+    │ • Input Sanitization    │       │ • 2FA Ready             │
+    └─────────────────────────┘       └─────────────────────────┘
+                  │                             │
+                  ▼                             ▼
+    ┌─────────────────────────┐       ┌─────────────────────────┐
+    │    HTTPS ENFORCEMENT    │       │     AUTHORIZATION       │
+    │                         │       │                         │
+    │ • TLS 1.3 Encryption    │ ────► │ • Role-based Access     │
+    │ • Certificate Pinning   │       │ • Permission Gates      │
+    │ • HSTS Headers          │       │ • Policy Classes        │
+    │ • Secure Cookies        │       │ • Resource Protection   │
+    └─────────────────────────┘       └─────────────────────────┘
+                  │                             │
+                  ▼                             ▼
+    ┌─────────────────────────┐       ┌─────────────────────────┐
+    │    RATE LIMITING        │       │    DATA PROTECTION      │
+    │                         │       │                         │
+    │ • API Throttling        │ ────► │ • Eloquent ORM          │
+    │ • DDoS Protection       │       │ • SQL Injection Prev.   │
+    │ • Request Validation    │       │ • Data Encryption       │
+    │ • IP Filtering          │       │ • GDPR Compliance       │
+    └─────────────────────────┘       └─────────────────────────┘
+
+COMPLIANCE & STANDARDS:
+════════════════════
+✅ DSGVO/GDPR Ready
+✅ OWASP Top 10 Protection  
+✅ ISO 27001 Principles
+✅ Security Headers (CSP, HSTS, etc.)
+✅ Regular Security Audits
+✅ Vulnerability Scanning
+✅ Penetration Testing Ready
+
+================================================================================
+                            🎯 PRÄSENTATIONS-TIPPS
+================================================================================
+
+⏰ ZEIT-MANAGEMENT (15 Min):
+══════════════════════════
+• 0-2 Min:  Problem & Motivation
+• 2-4 Min:  Lösung & Überblick
+• 4-10 Min: Live Demo (Hauptteil)
+• 10-13 Min: Technik & AI
+• 13-15 Min: Zukunft & Q&A
+
+🎨 VISUAL BEST PRACTICES:
+════════════════════════
+• Verwende die ASCII-Diagramme als Backup
+• Zeige die Mermaid-Flowcharts wenn möglich
+• Bereite Screenshots der tatsächlichen App vor
+• Nutze die visuellen Breakdowns für komplexe Teile
+
+🗣️ PRÄSENTATIONS-STRUKTUR:
+═════════════════════════
+1. Hook: "Wie oft stapeln sich ungenutzte Bücher?"
+2. Problem: Buchverschwendung & teure Neuanschaffungen
+3. Solution: BookShare als intelligente Antwort
+4. Demo: Hands-on Durchgang durch die App
+5. Tech: Beeindruckende Laravel + AI Integration
+6. Future: Skalierungspotential & Vision
+7. Closing: Nachhaltigkeit + Innovation
+
+💡 ERFOLGS-FAKTOREN:
+══════════════════
+• Betone die KI-Integration (sehr modern!)
+• Zeige echte Funktionalität, nicht nur Mockups
+• Erwähne die professionelle Laravel-Architektur
+• Hebe Nachhaltigkeit & Community-Aspekt hervor
+• Bereite dich auf technische Fragen vor
+
+================================================================================
+                                    ENDE
+================================================================================
+
+Diese visuellen Diagramme ergänzen die Hauptpräsentation und können als
+separate Folien oder Backup-Material verwendet werden. Sie sind optimiert
+für klare Darstellung auch bei schlechter Bildqualität oder in Schwarzweiß-Druck.
+
+VERWENDUNG:
+• Hauptpräsentation für gesprochene Inhalte
+• Diese Diagramme für visuelle Unterstützung  
+• Mermaid-Flowchart für interaktive Demonstration
+• Screenshots der echten App als Live-Demo Backup
